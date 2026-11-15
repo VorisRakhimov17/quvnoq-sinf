@@ -46,6 +46,14 @@ Kabinetdagi “✨ Mavzu bo‘yicha o‘yin” bo‘limi Claude API (`claude-opu
 Yoqish uchun `backend/.env` ga `ANTHROPIC_API_KEY=...` yozing (kalit: https://console.anthropic.com → API Keys) va backendni qayta ishga tushiring.
 Kalit bo‘lmasa, bu bo‘lim o‘chiq turadi, qolgan qismlar ishlayveradi. Har bir o‘qituvchiga kuniga 30 ta yaratish limiti bor (`backend/src/ai/ai.module.ts`).
 
+## Kreditlar
+
+- 1 kredit = 1 AI o‘yin. Yangi o‘qituvchiga 5 ta bepul kredit (`WELCOME_CREDITS`, `backend/src/credits/credits.module.ts`).
+- AI xato qilsa, kredit avtomatik qaytariladi. Har bir harakat `CreditTx` jadvalida saqlanadi.
+- Paket narxlari va bog‘lanish (Telegram/telefon): `frontend/src/config.ts`.
+- Sotish hozircha qo‘lda: to‘lov kelgach admin `/admin` sahifasida kredit qo‘shadi.
+  Admin bo‘lish uchun emailingizni `backend/.env` dagi `ADMIN_EMAILS` ga yozing.
+
 ## Foydali buyruqlar
 
 | Buyruq | Nima qiladi |
@@ -70,4 +78,7 @@ Barcha yo‘llar `/api` ostida. Belgilanganlari uchun `Authorization: Bearer <to
 | POST | `/api/questions/bulk` | 🔒 bir nechta savolni birga saqlash |
 | DELETE | `/api/questions/:id` | 🔒 savolni o‘chirish |
 | GET | `/api/ai/status` | 🔒 AI ulanganmi |
-| POST | `/api/ai/generate` | 🔒 mavzu bo‘yicha savollar yaratish (saqlamaydi) |
+| GET | `/api/credits` | 🔒 kredit balansi va tarixi |
+| GET | `/api/admin/teachers` | 🔒👑 o‘qituvchilar ro‘yxati |
+| POST | `/api/admin/credits` | 🔒👑 kredit qo‘shish/ayirish |
+| POST | `/api/ai/generate` | 🔒 mavzu bo‘yicha savollar yaratish (1 kredit, saqlamaydi) |

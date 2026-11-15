@@ -16,9 +16,33 @@ model Teacher {
   name         String
   email        String       @unique
   passwordHash String
+  /// AI bilan o'yin yaratish uchun kredit balansi (1 kredit = 1 o'yin)
+  credits      Int          @default(0)
   createdAt    DateTime     @default(now())
   results      GameResult[]
   questions    Question[]
+  creditTxs    CreditTx[]
+}
+
+enum CreditReason {
+  welcome  // ro'yxatdan o'tganda bepul
+  generate // o'yin yaratishga sarflandi
+  refund   // AI xato qilgani uchun qaytarildi
+  purchase // sotib olindi (admin qo'shdi)
+  admin    // admin qo'lda o'zgartirdi
+}
+
+/// Kredit harakatlari tarixi: har bir qo'shish va yechish
+model CreditTx {
+  id        Int          @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  amount    Int          // + qo'shildi, - yechildi
+  reason    CreditReason
+  note      String?
+  createdAt DateTime     @default(now())
+
+  @@index([teacherId, createdAt])
 }
 
 enum Subject {

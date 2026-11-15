@@ -11,7 +11,9 @@ export const tokenStore = {
   },
 };
 
-export type Teacher = { id: number; name: string; email: string };
+export type Teacher = { id: number; name: string; email: string; credits: number; isAdmin: boolean };
+export type CreditTx = { id: number; amount: number; reason: 'welcome' | 'generate' | 'refund' | 'purchase' | 'admin'; note: string | null; createdAt: string };
+export type AdminTeacher = { id: number; name: string; email: string; credits: number; createdAt: string };
 export type Session = { token: string; teacher: Teacher };
 export type GameResult = {
   id: number; gameId: string; grade: number; teams: boolean;
@@ -74,5 +76,10 @@ export const api = {
 
   aiStatus: () => request<{ enabled: boolean }>('/ai/status'),
   aiGenerate: (p: { subject: SubjectId; grade: number; topic: string; count: number }) =>
-    request<GeneratedQuestion[]>('/ai/generate', 'POST', p),
+    request<{ questions: GeneratedQuestion[]; credits: number }>('/ai/generate', 'POST', p),
+
+  credits: () => request<{ credits: number; history: CreditTx[] }>('/credits'),
+  adminTeachers: (q = '') => request<AdminTeacher[]>('/admin/teachers' + (q ? `?q=${encodeURIComponent(q)}` : '')),
+  adminGrant: (p: { teacherId: number; amount: number; reason: 'purchase' | 'admin'; note?: string }) =>
+    request<{ teacherId: number; credits: number }>('/admin/credits', 'POST', p),
 };

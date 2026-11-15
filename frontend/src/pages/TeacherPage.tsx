@@ -1,14 +1,17 @@
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { api, type CustomQuestion, type GameResult } from '../api';
 import { useAuth } from '../auth';
+import Credits from '../components/Credits';
 import TopicGame, { topicLink } from '../components/TopicGame';
 import { SUBJECTS, gameTitle } from '../games';
 import type { SubjectId } from '../games/types';
 
 export default function TeacherPage() {
   const { teacher, loading, signOut } = useAuth();
-  const [tab, setTab] = useState<'topic' | 'results' | 'questions'>('topic');
+  const [params, setParams] = useSearchParams();
+  const tab = (['topic', 'results', 'questions', 'kredit'] as const).find((t) => t === params.get('tab')) ?? 'topic';
+  const setTab = (t: typeof tab) => setParams(t === 'topic' ? {} : { tab: t }, { replace: true });
 
   if (loading) return <p className="empty">Yuklanmoqda…</p>;
   if (!teacher) return <Navigate to="/kirish" replace />;
@@ -26,8 +29,9 @@ export default function TeacherPage() {
         <button className="chip" aria-pressed={tab === 'topic'} onClick={() => setTab('topic')}>✨ Mavzu bo‘yicha o‘yin</button>
         <button className="chip" aria-pressed={tab === 'results'} onClick={() => setTab('results')}>Natijalar</button>
         <button className="chip" aria-pressed={tab === 'questions'} onClick={() => setTab('questions')}>Mening savollarim</button>
+        <button className="chip" aria-pressed={tab === 'kredit'} onClick={() => setTab('kredit')}>💎 Kreditlar: {teacher.credits}</button>
       </div>
-      {tab === 'topic' ? <TopicGame /> : tab === 'results' ? <Results /> : <Questions />}
+      {tab === 'topic' ? <TopicGame onBuy={() => setTab('kredit')} /> : tab === 'results' ? <Results /> : tab === 'kredit' ? <Credits /> : <Questions />}
     </div>
   );
 }

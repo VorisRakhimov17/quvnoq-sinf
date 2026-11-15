@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
+import { useAuth } from '../auth';
 import { SUBJECTS } from '../games';
 import type { SubjectId } from '../games/types';
 
@@ -16,8 +17,10 @@ const EXAMPLES: Record<SubjectId, string> = {
 export const topicLink = (subject: SubjectId, topic: string) =>
   `/oyin/mening-${subject}?mavzu=${encodeURIComponent(topic)}`;
 
-export default function TopicGame({ onSaved }: { onSaved?: () => void }) {
+export default function TopicGame({ onSaved, onBuy }: { onSaved?: () => void; onBuy?: () => void }) {
   const nav = useNavigate();
+  const { teacher, setCredits } = useAuth();
+  const credits = teacher?.credits ?? 0;
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [subject, setSubject] = useState<SubjectId>('math');
   const [grade, setGrade] = useState(1);
@@ -36,11 +39,13 @@ export default function TopicGame({ onSaved }: { onSaved?: () => void }) {
     if (t.length < 2) { setError('Mavzuni yozing.'); return; }
     setError(''); setBusy('gen');
     try {
-      const qs = await api.aiGenerate({ subject, grade, topic: t, count });
+      const { questions: qs, credits: left } = await api.aiGenerate({ subject, grade, topic: t, count });
+      setCredits(left);
       setDrafts(qs.map((q) => ({ ...q, answer: Math.max(0, q.options.indexOf(q.answer)) })));
       setMade({ subject, grade, topic: t });
     } catch (err) {
       setError((err as Error).message);
+      api.credits().then((d) => setCredits(d.credits), () => {});
     } finally {
       setBusy('');
     }
@@ -121,9 +126,20 @@ export default function TopicGame({ onSaved }: { onSaved?: () => void }) {
           <input id="ai-topic" value={topic} onChange={(e) => setTopic(e.target.value)} maxLength={200} placeholder={EXAMPLES[subject]} />
         </label>
         {error && !drafts && <p className="error">{error}</p>}
-        <button className="primary" disabled={busy !== ''}>
-          {busy === 'gen' ? 'Savollar tayyorlanmoqda… (20–60 soniya)' : drafts ? '↻ Qaytadan yaratish' : '✨ O‘yin yaratish'}
-        </button>
+        {credits < 1 ? (
+          <div className="notice">
+            <strong>Kredit tugadi.</strong>
+            <p className="muted">Yangi o‘yin yaratish uchun kredit sotib oling. Saqlangan o‘yinlarni “Mening savollarim”dan bepul o‘ynashingiz mumkin.</p>
+            <button type="button" className="primary small" onClick={onBuy}>💎 Kredit sotib olish</button>
+          </div>
+        ) : (
+          <div className="gen-row">
+            <button className="primary" disabled={busy !== ''}>
+              {busy === 'gen' ? 'Savollar tayyorlanmoqda… (20–60 soniya)' : drafts ? '↻ Qaytadan yaratish' : '✨ O‘yin yaratish'}
+            </button>
+            <span className="muted">1 kredit sarflanadi · qoldi: <strong>💎 {credits}</strong></span>
+          </div>
+        )}
       </form>
 
       {drafts && made && (

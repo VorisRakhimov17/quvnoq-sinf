@@ -2,6 +2,7 @@ import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './auth';
 import GamePage from './pages/GamePage';
 import Home from './pages/Home';
+import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
 import TeacherPage from './pages/TeacherPage';
 import { useSettings } from './settings';
@@ -24,7 +25,11 @@ function Header() {
       </Link>
       <nav>
         {teacher ? (
-          <Link className="ghost" to="/kabinet">{teacher.name}: kabinet</Link>
+          <>
+            {teacher.isAdmin && <Link className="ghost" to="/admin">Admin</Link>}
+            <Link className="ghost credit-chip" to="/kabinet?tab=kredit" title="Kredit balansi">💎 {teacher.credits}</Link>
+            <Link className="ghost" to="/kabinet">{teacher.name}: kabinet</Link>
+          </>
         ) : (
           <Link className="ghost" to="/kirish">O‘qituvchi kirishi</Link>
         )}
@@ -44,6 +49,7 @@ export default function App() {
         <Route path="/oyin/:id" element={<GamePage settings={settings} />} />
         <Route path="/kirish" element={<Login />} />
         <Route path="/kabinet" element={<TeacherPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<p className="empty">Sahifa topilmadi. <Link to="/">Bosh sahifaga qaytish</Link></p>} />
       </Routes>
     </div>

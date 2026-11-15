@@ -1,23 +1,32 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
+import { CreditsService, WELCOME_CREDITS } from '../credits/credits.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto, RegisterDto } from './auth.dto';
 
-type TeacherRow = { id: number; name: string; email: string };
+type TeacherRow = { id: number; name: string; email: string; credits: number };
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly credits: CreditsService,
   ) {}
 
   async register(dto: RegisterDto) {
     const exists = await this.prisma.teacher.findUnique({ where: { email: dto.email } });
     if (exists) throw new ConflictException("Bu email bilan akkaunt allaqachon bor");
+    const passwordHash = await bcrypt.hash(dto.password, 10);
     const teacher = await this.prisma.teacher.create({
-      data: { name: dto.name, email: dto.email, passwordHash: await bcrypt.hash(dto.password, 10) },
+      data: {
+        name: dto.name,
+        email: dto.email,
+        passwordHash,
+        credits: WELCOME_CREDITS,
+        creditTxs: { create: { amount: WELCOME_CREDITS, reason: 'welcome', note: 'Xush kelibsiz sovg‘asi' } },
+      },
     });
     return this.session(teacher);
   }
@@ -42,6 +51,6 @@ export class AuthService {
   }
 
   private publicTeacher(t: TeacherRow) {
-    return { id: t.id, name: t.name, email: t.email };
+    return { id: t.id, name: t.name, email: t.email, credits: t.credits, isAdmin: this.credits.isAdminEmail(t.email) };
   }
 }

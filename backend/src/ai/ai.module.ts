@@ -20,6 +20,7 @@ import { Subject } from '@prisma/client';
 import { IsIn, IsInt, IsString, Length, Max, Min } from 'class-validator';
 import { z } from 'zod';
 import { JwtAuthGuard, TeacherId } from '../auth/jwt.guard';
+import { CreditsService, GAME_COST } from '../credits/credits.module';
 
 const SUBJECTS = ['math', 'lang', 'nature'] as const;
 const SUBJECT_NAMES: Record<Subject, string> = {
@@ -84,7 +85,10 @@ export class AiService {
   private readonly client: Anthropic | null;
   private readonly usage = new Map<string, number>();
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly credits: CreditsService,
+  ) {
     const key = config.get<string>('ANTHROPIC_API_KEY')?.trim();
     this.client = key ? new Anthropic({ apiKey: key }) : null;
   }
@@ -102,11 +106,25 @@ export class AiService {
     this.usage.set(k, n + 1);
   }
 
-  async generate(teacherId: number, dto: GenerateDto): Promise<GeneratedQuestion[]> {
+  /** Kredit yechib o'yin yaratadi; AI tomonda xato bo'lsa kreditni qaytaradi */
+  async generate(teacherId: number, dto: GenerateDto): Promise<{ questions: GeneratedQuestion[]; credits: number }> {
     if (!this.client) {
       throw new ServiceUnavailableException('AI ulanmagan: backend/.env faylida ANTHROPIC_API_KEY yo‘q.');
     }
     this.checkLimit(teacherId);
+    const topic = dto.topic.trim();
+    await this.credits.spend(teacherId, GAME_COST, `${topic} (${dto.grade}-sinf)`);
+    try {
+      const questions = await this.callModel(dto);
+      return { questions, credits: await this.credits.balance(teacherId) };
+    } catch (e) {
+      await this.credits.grant(teacherId, GAME_COST, 'refund', `Xatolik: ${topic}`);
+      throw e;
+    }
+  }
+
+  private async callModel(dto: GenerateDto): Promise<GeneratedQuestion[]> {
+    if (!this.client) throw new ServiceUnavailableException('AI ulanmagan');
 
     const user = `Fan: ${SUBJECT_NAMES[dto.subject]}
 Sinf: ${dto.grade}-sinf
@@ -144,6 +162,9 @@ Savollar soni: ${dto.count}`;
       }
       throw e;
     }
+
+    const u = res.usage;
+    this.log.log(`usage model=${res.model} in=${u.input_tokens} out=${u.output_tokens} count=${dto.count}`);
 
     if (res.stop_reason === 'refusal') {
       throw new UnprocessableEntityException('Bu mavzu bo‘yicha savol yaratib bo‘lmadi. Mavzuni boshqacha yozib ko‘ring.');

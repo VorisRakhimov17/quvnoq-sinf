@@ -17,6 +17,11 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 ## AI (mavzu bo'yicha o'yin)
 - `backend/src/ai/ai.module.ts`: `@anthropic-ai/sdk`, `beta.messages.parse` + zod sxema, `fallbacks: 'default'`. Kalit `ANTHROPIC_API_KEY` (.env). Savollar `topic` maydoni bilan saqlanadi; o'yin: `/oyin/mening-<fan>?mavzu=<mavzu>`.
 
+## Kreditlar (pullik model)
+- 1 kredit = 1 AI o'yin; yangi o'qituvchiga 5 bepul. Narx o'lchovi (2026-11-15, claude-opus-5-5): 10 savol ≈ 900 in / 2200 out token ≈ $0.047, 15 savol ≈ $0.07.
+- Paketlar: 10 — 15 000, 30 — 39 000, 100 — 119 000 so'm (`frontend/src/config.ts`). To'lov hozircha qo'lda, admin `/admin` dan qo'shadi; keyin Payme/Click integratsiyasi rejada.
+- Admin: `ADMIN_EMAILS` (.env). `CreditsService.spend` atomik; AI xatosida `refund`.
+
 ## Lokal muhit
 - Baza: `quvnoq_sinf`, foydalanuvchi `quvnoq` (scripts/setup-local-db.ps1 bilan yaratilgan, paroli faqat backend/.env da).
 - `postgres` superuser paroli noma'lum — unga tegilmaydi.

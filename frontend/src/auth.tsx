@@ -6,6 +6,8 @@ type AuthState = {
   loading: boolean;
   signIn: (s: Session) => void;
   signOut: () => void;
+  /** Kredit balansini yangilaydi (o'yin yaratgandan keyin) */
+  setCredits: (n: number) => void;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -27,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     signIn: (s) => { tokenStore.set(s.token); setTeacher(s.teacher); },
     signOut: () => { tokenStore.set(null); setTeacher(null); },
+    setCredits: (n) => setTeacher((t) => (t ? { ...t, credits: n } : t)),
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
