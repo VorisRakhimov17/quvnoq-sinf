@@ -1,5 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
@@ -24,6 +25,7 @@ class HealthController {
     AuthModule,
     ResultsModule,
     QuestionsModule,
+    AiModule,
   ],
   controllers: [HealthController],
 })

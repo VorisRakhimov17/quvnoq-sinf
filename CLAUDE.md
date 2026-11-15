@@ -14,6 +14,9 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 - Sirlar faqat `backend/.env` da (gitga tushmaydi). Namuna: `backend/.env.example`.
 - Loyiha qarorlari va eslatmalar shu fayl va `docs/` da saqlanadi.
 
+## AI (mavzu bo'yicha o'yin)
+- `backend/src/ai/ai.module.ts`: `@anthropic-ai/sdk`, `beta.messages.parse` + zod sxema, `fallbacks: 'default'`. Kalit `ANTHROPIC_API_KEY` (.env). Savollar `topic` maydoni bilan saqlanadi; o'yin: `/oyin/mening-<fan>?mavzu=<mavzu>`.
+
 ## Lokal muhit
 - Baza: `quvnoq_sinf`, foydalanuvchi `quvnoq` (scripts/setup-local-db.ps1 bilan yaratilgan, paroli faqat backend/.env da).
 - `postgres` superuser paroli noma'lum — unga tegilmaydi.

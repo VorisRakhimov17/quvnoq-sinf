@@ -176,3 +176,26 @@ td.num { font-variant-numeric: tabular-nums; font-weight: 800; }
   .answers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .opt { min-height: 76px; padding: 14px 8px; }
 }
+
+/* Mavzu bo'yicha AI o'yin */
+.primary.small { padding: 8px 14px; font-size: 1rem; border-radius: 12px; white-space: nowrap; }
+.form .row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.topic { display: flex; flex-direction: column; gap: 24px; }
+.topic-form { max-width: 720px; }
+.topic-form .primary { align-self: flex-start; }
+.notice { border: 2px dashed var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.drafts { display: flex; flex-direction: column; gap: 14px; }
+.drafts-head h3 { margin-bottom: 4px; }
+.draft-list { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 14px; }
+.draft-list > li::marker { font-family: var(--display); font-weight: 800; color: var(--muted); }
+.draft { border: 2px solid var(--line); border-radius: 16px; padding: 12px; gap: 10px; }
+.draft-top { display: flex; gap: 8px; align-items: center; }
+.draft .emoji-in { width: 3.4em; text-align: center; font-size: 1.4rem; padding: 4px; flex: none; }
+.draft .prompt-in { flex: 1; font-weight: 800; }
+.draft-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.form input.is-right { border-color: var(--ok); }
+.drafts-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.topics { margin-bottom: 18px; }
+@media (max-width: 720px) {
+  .form .row.three, .draft-opts { grid-template-columns: 1fr; }
+}

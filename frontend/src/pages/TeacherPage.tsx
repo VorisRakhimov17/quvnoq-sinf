@@ -1,13 +1,14 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { api, type CustomQuestion, type GameResult } from '../api';
 import { useAuth } from '../auth';
+import TopicGame, { topicLink } from '../components/TopicGame';
 import { SUBJECTS, gameTitle } from '../games';
 import type { SubjectId } from '../games/types';
 
 export default function TeacherPage() {
   const { teacher, loading, signOut } = useAuth();
-  const [tab, setTab] = useState<'results' | 'questions'>('results');
+  const [tab, setTab] = useState<'topic' | 'results' | 'questions'>('topic');
 
   if (loading) return <p className="empty">Yuklanmoqda…</p>;
   if (!teacher) return <Navigate to="/kirish" replace />;
@@ -22,10 +23,11 @@ export default function TeacherPage() {
         <button className="ghost" onClick={signOut}>Chiqish</button>
       </div>
       <div className="chips tabs">
+        <button className="chip" aria-pressed={tab === 'topic'} onClick={() => setTab('topic')}>✨ Mavzu bo‘yicha o‘yin</button>
         <button className="chip" aria-pressed={tab === 'results'} onClick={() => setTab('results')}>Natijalar</button>
         <button className="chip" aria-pressed={tab === 'questions'} onClick={() => setTab('questions')}>Mening savollarim</button>
       </div>
-      {tab === 'results' ? <Results /> : <Questions />}
+      {tab === 'topic' ? <TopicGame /> : tab === 'results' ? <Results /> : <Questions />}
     </div>
   );
 }
@@ -153,6 +155,7 @@ function Questions() {
       </form>
 
       <div>
+        <Topics list={list} />
         <h3>Qo‘shilgan savollar {list ? `(${list.length})` : ''}</h3>
         {!list ? <p className="muted">Yuklanmoqda…</p> : list.length === 0 ? (
           <p className="empty">Hali savol yo‘q. Qo‘shgan savollaringiz bosh sahifadagi “Mening savollarim” o‘yinida chiqadi.</p>
@@ -163,7 +166,7 @@ function Questions() {
                 <span className="qemoji">{q.emoji || '❓'}</span>
                 <div>
                   <strong>{q.prompt}</strong>
-                  <small>{SUBJECTS[q.subject].name} · {q.grade}-sinf · Javob: {q.answer}</small>
+                  <small>{SUBJECTS[q.subject].name} · {q.grade}-sinf{q.topic ? ` · ${q.topic}` : ''} · Javob: {q.answer}</small>
                 </div>
                 <button className="ghost small" onClick={() => remove(q.id)}>O‘chirish</button>
               </li>
@@ -171,6 +174,38 @@ function Questions() {
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+const SUBJECT_ICON: Record<SubjectId, string> = { math: '🔢', lang: '📖', nature: '🌿' };
+
+/** Mavzular ro'yxati: har biri alohida o'yin sifatida ochiladi */
+function Topics({ list }: { list: CustomQuestion[] | null }) {
+  if (!list) return null;
+  const map = new Map<string, { subject: SubjectId; topic: string; grade: number; n: number }>();
+  for (const q of list) {
+    if (!q.topic) continue;
+    const k = `${q.subject}|${q.topic}`;
+    const t = map.get(k);
+    if (t) t.n++; else map.set(k, { subject: q.subject, topic: q.topic, grade: q.grade, n: 1 });
+  }
+  if (map.size === 0) return null;
+  return (
+    <div className="topics">
+      <h3>Mavzular</h3>
+      <ul className="qlist">
+        {[...map.values()].map((t) => (
+          <li key={`${t.subject}|${t.topic}`}>
+            <span className="qemoji">{SUBJECT_ICON[t.subject]}</span>
+            <div>
+              <strong>{t.topic}</strong>
+              <small>{SUBJECTS[t.subject].name} · {t.grade}-sinf · {t.n} ta savol</small>
+            </div>
+            <Link className="primary small" style={{ '--c': SUBJECTS[t.subject].color } as CSSProperties} to={topicLink(t.subject, t.topic)}>▶ O‘ynash</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

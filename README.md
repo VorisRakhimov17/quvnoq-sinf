@@ -40,6 +40,12 @@ prototype/            birinchi bitta faylli versiya
    ```
 4. Brauzerda oching: http://localhost:5173
 
+## Mavzu bo‘yicha AI o‘yin
+
+Kabinetdagi “✨ Mavzu bo‘yicha o‘yin” bo‘limi Claude API (`claude-opus-5-5`) yordamida savollar tayyorlaydi.
+Yoqish uchun `backend/.env` ga `ANTHROPIC_API_KEY=...` yozing (kalit: https://console.anthropic.com → API Keys) va backendni qayta ishga tushiring.
+Kalit bo‘lmasa, bu bo‘lim o‘chiq turadi, qolgan qismlar ishlayveradi. Har bir o‘qituvchiga kuniga 30 ta yaratish limiti bor (`backend/src/ai/ai.module.ts`).
+
 ## Foydali buyruqlar
 
 | Buyruq | Nima qiladi |
@@ -61,4 +67,7 @@ Barcha yo‘llar `/api` ostida. Belgilanganlari uchun `Authorization: Bearer <to
 | GET | `/api/auth/me` | 🔒 joriy o‘qituvchi |
 | GET/POST | `/api/results` | 🔒 o‘yin natijalari |
 | GET/POST | `/api/questions` | 🔒 o‘qituvchi savollari |
+| POST | `/api/questions/bulk` | 🔒 bir nechta savolni birga saqlash |
 | DELETE | `/api/questions/:id` | 🔒 savolni o‘chirish |
+| GET | `/api/ai/status` | 🔒 AI ulanganmi |
+| POST | `/api/ai/generate` | 🔒 mavzu bo‘yicha savollar yaratish (saqlamaydi) |

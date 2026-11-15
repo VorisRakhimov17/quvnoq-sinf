@@ -24,6 +24,7 @@ import {
   IsOptional,
   IsString,
   Length,
+  ValidateNested,
   Max,
   MaxLength,
   Min,
@@ -46,11 +47,22 @@ export class CreateQuestionDto {
   options: string[];
   @IsString() @Length(1, 60) answer: string;
   @IsOptional() @IsString() @MaxLength(300) explain?: string;
+  @IsOptional() @IsString() @MaxLength(200) topic?: string;
+}
+
+export class BulkQuestionsDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(30)
+  @ValidateNested({ each: true })
+  @Type(() => CreateQuestionDto)
+  questions: CreateQuestionDto[];
 }
 
 export class ListQuestionsQuery {
   @IsOptional() @IsIn(SUBJECTS) subject?: Subject;
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(4) grade?: number;
+  @IsOptional() @IsString() @MaxLength(200) topic?: string;
 }
 
 @Injectable()
@@ -59,23 +71,33 @@ export class QuestionsService {
 
   list(teacherId: number, q: ListQuestionsQuery) {
     return this.prisma.question.findMany({
-      where: { teacherId, subject: q.subject, grade: q.grade },
+      where: { teacherId, subject: q.subject, grade: q.grade, topic: q.topic },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  create(teacherId: number, dto: CreateQuestionDto) {
+  private prepare(teacherId: number, dto: CreateQuestionDto, n?: number) {
+    const at = n === undefined ? '' : `${n}-savol: `;
     const options = dto.options.map((o) => o.trim());
     const answer = dto.answer.trim();
     if (new Set(options).size !== options.length) {
-      throw new BadRequestException('Javob variantlari takrorlanmasin');
+      throw new BadRequestException(at + 'Javob variantlari takrorlanmasin');
     }
     if (!options.includes(answer)) {
-      throw new BadRequestException("To'g'ri javob variantlar ichida bo'lishi kerak");
+      throw new BadRequestException(at + "To'g'ri javob variantlar ichida bo'lishi kerak");
     }
-    return this.prisma.question.create({
-      data: { ...dto, prompt: dto.prompt.trim(), options, answer, teacherId },
-    });
+    const topic = dto.topic?.trim() || undefined;
+    return { ...dto, prompt: dto.prompt.trim(), options, answer, topic, teacherId };
+  }
+
+  create(teacherId: number, dto: CreateQuestionDto) {
+    return this.prisma.question.create({ data: this.prepare(teacherId, dto) });
+  }
+
+  async createMany(teacherId: number, dto: BulkQuestionsDto) {
+    const data = dto.questions.map((q, i) => this.prepare(teacherId, q, i + 1));
+    const { count } = await this.prisma.question.createMany({ data });
+    return { created: count };
   }
 
   async remove(teacherId: number, id: number) {
@@ -93,6 +115,11 @@ export class QuestionsController {
   @Get()
   list(@TeacherId() teacherId: number, @Query() q: ListQuestionsQuery) {
     return this.questions.list(teacherId, q);
+  }
+
+  @Post('bulk')
+  createMany(@TeacherId() teacherId: number, @Body() dto: BulkQuestionsDto) {
+    return this.questions.createMany(teacherId, dto);
   }
 
   @Post()

@@ -19,11 +19,12 @@ export type GameResult = {
 };
 export type CustomQuestion = {
   id: number; subject: SubjectId; grade: number; prompt: string; emoji: string | null;
-  options: string[]; answer: string; explain: string | null; createdAt: string;
+  options: string[]; answer: string; explain: string | null; topic: string | null; createdAt: string;
 };
-export type NewQuestion = Omit<CustomQuestion, 'id' | 'createdAt' | 'emoji' | 'explain'> & {
-  emoji?: string; explain?: string;
+export type NewQuestion = Omit<CustomQuestion, 'id' | 'createdAt' | 'emoji' | 'explain' | 'topic'> & {
+  emoji?: string; explain?: string; topic?: string;
 };
+export type GeneratedQuestion = { prompt: string; emoji: string; options: string[]; answer: string; explain: string };
 
 async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   const token = tokenStore.get();
@@ -58,13 +59,20 @@ export const api = {
     request<GameResult>('/results', 'POST', r),
   results: () => request<GameResult[]>('/results'),
 
-  questions: (q: { subject?: SubjectId; grade?: number } = {}) => {
+  questions: (q: { subject?: SubjectId; grade?: number; topic?: string } = {}) => {
     const p = new URLSearchParams();
     if (q.subject) p.set('subject', q.subject);
     if (q.grade) p.set('grade', String(q.grade));
+    if (q.topic) p.set('topic', q.topic);
     const s = p.toString();
     return request<CustomQuestion[]>('/questions' + (s ? `?${s}` : ''));
   },
   addQuestion: (q: NewQuestion) => request<CustomQuestion>('/questions', 'POST', q),
+  addQuestions: (questions: NewQuestion[]) =>
+    request<{ created: number }>('/questions/bulk', 'POST', { questions }),
   deleteQuestion: (id: number) => request<{ deleted: boolean }>(`/questions/${id}`, 'DELETE'),
+
+  aiStatus: () => request<{ enabled: boolean }>('/ai/status'),
+  aiGenerate: (p: { subject: SubjectId; grade: number; topic: string; count: number }) =>
+    request<GeneratedQuestion[]>('/ai/generate', 'POST', p),
 };

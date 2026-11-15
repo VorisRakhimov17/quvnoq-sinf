@@ -56,7 +56,10 @@ model Question {
   options   String[]
   answer    String
   explain   String?
+  /// Dars mavzusi (masalan "7 karra jadvali"); AI yaratgan savollar shu bilan guruhlanadi
+  topic     String?
   createdAt DateTime @default(now())
 
   @@index([teacherId, subject, grade])
+  @@index([teacherId, topic])
 }

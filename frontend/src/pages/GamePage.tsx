@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api, type CustomQuestion } from '../api';
 import { useAuth } from '../auth';
 import BuildAnswer from '../components/BuildAnswer';
@@ -24,19 +24,27 @@ function customToQ(c: CustomQuestion): ChoiceQ {
 
 export default function GamePage({ settings }: { settings: SettingsApi }) {
   const { id } = useParams();
+  const [search] = useSearchParams();
+  const topic = search.get('mavzu') || undefined;
   const game = GAMES.find((g) => g.id === id);
   const { teacher, loading } = useAuth();
   const [pool, setPool] = useState<ChoiceQ[] | null>(null);
+  const [topicGrade, setTopicGrade] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [run, setRun] = useState(0);
 
   useEffect(() => {
     if (!game?.custom || loading) return;
     if (!teacher) { setError('Bu o‘yin uchun o‘qituvchi sifatida kiring.'); return; }
-    api.questions({ subject: game.subject, grade: settings.grade })
-      .then((qs) => setPool(shuffle(qs).slice(0, ROUND).map(customToQ)))
+    // Mavzu tanlangan bo'lsa: o'sha mavzuning hamma savollari (sinfdan qat'i nazar), aks holda 10 tasi
+    const req = topic ? api.questions({ subject: game.subject, topic }) : api.questions({ subject: game.subject, grade: settings.grade });
+    req
+      .then((qs) => {
+        setTopicGrade(topic && qs.length ? qs[0].grade : null);
+        setPool(shuffle(qs).slice(0, topic ? 30 : ROUND).map(customToQ));
+      })
       .catch((e: Error) => setError(e.message));
-  }, [game, teacher, loading, settings.grade]);
+  }, [game, teacher, loading, settings.grade, topic]);
 
   const again = () => {
     if (pool) setPool(shuffle(pool).map((q) => ({ ...q, options: shuffle(q.options) })));
@@ -50,14 +58,15 @@ export default function GamePage({ settings }: { settings: SettingsApi }) {
     if (error) return <Notice style={style} text={error} />;
     if (!pool) return <Notice style={style} text="Savollar yuklanmoqda…" />;
     if (pool.length === 0)
-      return <Notice style={style} text={`${settings.grade}-sinf uchun bu fanda hali savol qo‘shilmagan. Kabinetdan savol qo‘shing.`} />;
+      return <Notice style={style} text={topic ? `“${topic}” mavzusida savol topilmadi.` : `${settings.grade}-sinf uchun bu fanda hali savol qo‘shilmagan. Kabinetdan savol qo‘shing.`} />;
   }
 
   const total = game.custom ? pool!.length : ROUND;
   const makeQ = game.custom ? (i: number) => pool![i] : () => game.gen!(settings.grade);
   return (
     <section style={style}>
-      <Round key={run} game={game} total={total} makeQ={makeQ} settings={settings} onAgain={again} />
+      <Round key={run} game={topic ? { ...game, title: topic } : game} total={total} makeQ={makeQ}
+        settings={topicGrade ? { ...settings, grade: topicGrade as SettingsApi['grade'] } : settings} onAgain={again} />
     </section>
   );
 }
