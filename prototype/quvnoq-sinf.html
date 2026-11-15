@@ -1,0 +1,520 @@
+<title>Quvnoq Sinf</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: katak daftar (notebook grid) page. Home = grade + mode picker, then three subject shelves of game cards.
+   Game = one large question board sized for a classroom projector, answered by tap or keys 1–4. */
+:root{
+  --paper:#F5F8FC; --grid:#DFE7F3; --card:#FFFFFF; --line:#D3DCEA;
+  --ink:#1B2540; --muted:#5A6788;
+  --math:#2D5BE3; --lang:#D9691A; --nature:#1C8C4E;
+  --ok:#17914F; --okbg:#E2F5E9; --bad:#CC3333; --badbg:#FBE5E5;
+  --team1:#2D5BE3; --team2:#B8317F;
+  --star:#F2B21B;
+  --display:"Baloo 2","Nunito",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --c:var(--math);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#14241D; --grid:#1D3229; --card:#1B3027; --line:#2E4A3D;
+    --ink:#EEF4EE; --muted:#A6BBAE;
+    --math:#86A6FF; --lang:#FFAB62; --nature:#63D493;
+    --ok:#63D493; --okbg:#1D4030; --bad:#FF8080; --badbg:#46262A;
+    --team1:#86A6FF; --team2:#F08CC8; --star:#FFCB45;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14241D; --grid:#1D3229; --card:#1B3027; --line:#2E4A3D;
+  --ink:#EEF4EE; --muted:#A6BBAE;
+  --math:#86A6FF; --lang:#FFAB62; --nature:#63D493;
+  --ok:#63D493; --okbg:#1D4030; --bad:#FF8080; --badbg:#46262A;
+  --team1:#86A6FF; --team2:#F08CC8; --star:#FFCB45;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
+
+/* Header */
+.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:6px 18px}
+.brand svg{flex:none}
+.brand h1{font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1;margin:0;letter-spacing:-.01em}
+.brand p{margin:2px 0 0;color:var(--muted);font-weight:600}
+
+/* Setup panel */
+.setup{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px 22px;display:grid;grid-template-columns:1.3fr 1fr;gap:18px 32px;align-items:start}
+.setup h2{font-family:var(--display);font-size:1.05rem;margin:0 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:2px solid var(--line);background:transparent;border-radius:999px;padding:8px 18px;font-weight:800;font-size:1.05rem}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.tip{grid-column:1/-1;margin:0;color:var(--muted);font-size:.95rem;border-top:1px dashed var(--line);padding-top:14px;max-width:80ch}
+.tip b{color:var(--ink)}
+
+/* Subjects */
+.subject{margin-top:34px}
+.subject-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.subject-head h2{font-family:var(--display);font-weight:800;font-size:1.75rem;margin:0;color:var(--c);text-wrap:balance}
+.subject-head span{color:var(--muted);font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.game-card{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:0;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s ease,border-color .15s ease}
+.game-card:hover{transform:translateY(-3px);border-color:var(--c)}
+.sample{background:color-mix(in srgb,var(--c) 13%,var(--card));color:var(--c);font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1.1;padding:22px 20px 16px;min-height:92px;display:flex;align-items:center;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.card-body{padding:14px 20px 18px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card-body strong{font-family:var(--display);font-size:1.3rem;line-height:1.2}
+.card-body small{color:var(--muted);font-size:.95rem;font-weight:600}
+.card-body .go{margin-top:auto;padding-top:10px;color:var(--c);font-weight:800}
+
+/* Game bar */
+.gbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.gtitle{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.gtitle span{color:var(--c);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.07em}
+.gtitle strong{font-family:var(--display);font-size:1.5rem}
+.gtools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ghost{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 14px;font-weight:800;display:inline-flex;align-items:center;gap:6px}
+.ghost:hover{border-color:var(--c)}
+.pill{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.team{border-color:transparent;background:color-mix(in srgb,var(--tc) 14%,var(--card));color:var(--tc)}
+.pill.team.active{border-color:var(--tc)}
+.t1{--tc:var(--team1)} .t2{--tc:var(--team2)}
+.progress{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:16px}
+.progress i{display:block;height:100%;background:var(--c);border-radius:99px;transition:width .3s ease}
+
+/* Board */
+.board{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(20px,4vw,48px);text-align:center;display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2.4vw,26px)}
+.turn{font-family:var(--display);font-weight:800;font-size:1.3rem;padding:4px 18px;border-radius:999px;background:color-mix(in srgb,var(--tc) 14%,var(--card));color:var(--tc)}
+.ask{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(1.4rem,3vw,2.2rem);color:var(--muted);text-wrap:balance}
+.ask small{display:block;font-size:.65em;font-weight:600}
+.prompt{max-width:100%}
+.expr{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,6.5rem);line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.blank{display:inline-block;min-width:1.1em;color:var(--c);border-bottom:.08em dashed var(--c);line-height:1}
+.pic{font-size:clamp(4rem,13vw,8.5rem);line-height:1.1}
+.word{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,7vw,5rem);letter-spacing:.06em;line-height:1.1}
+.word .v{color:var(--c)}
+.count-pile{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 14px;max-width:900px;font-size:clamp(2rem,5.4vw,3.8rem);line-height:1}
+.count-grid{display:flex;flex-direction:column;gap:10px;font-size:clamp(1.5rem,3.8vw,2.7rem);line-height:1;padding:12px 16px;border:2px dashed var(--line);border-radius:18px}
+.count-grid div{display:flex;gap:10px;justify-content:center}
+
+.answers{width:100%;max-width:980px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.opt{position:relative;background:var(--card);border:3px solid var(--line);border-radius:20px;padding:18px 14px;font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3.8vw,3rem);line-height:1.1;min-height:96px;display:flex;align-items:center;justify-content:center;gap:10px;font-variant-numeric:tabular-nums;transition:transform .1s ease,border-color .15s ease,background .15s ease}
+.opt.text{font-size:clamp(1.25rem,2.6vw,2rem)}
+.opt:hover:not(:disabled){border-color:var(--c);transform:translateY(-2px)}
+.opt:disabled{cursor:default}
+.opt kbd{position:absolute;top:8px;left:10px;font-family:var(--body);font-size:.8rem;font-weight:800;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 6px}
+.opt.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok);animation:pop .35s ease}
+.opt.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad);animation:shake .35s ease}
+.opt.dim{opacity:.45}
+
+.slots,.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.slot,.tile{min-width:clamp(54px,8vw,84px);height:clamp(60px,9vw,92px);padding:0 10px;border-radius:16px;font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,4.4vw,3.2rem);display:flex;align-items:center;justify-content:center}
+.slot{background:transparent;border:3px dashed var(--line)}
+.slot.full{border-style:solid;border-color:var(--c);color:var(--c)}
+.slot.ok{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.slot.bad{border-color:var(--bad);color:var(--bad);background:var(--badbg)}
+.tile{background:color-mix(in srgb,var(--c) 14%,var(--card));border:3px solid transparent;color:var(--ink)}
+.tile:hover:not(:disabled){border-color:var(--c)}
+.tile:disabled{visibility:hidden}
+.build{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+
+.feedback{min-height:2.2em;font-size:clamp(1.15rem,2.4vw,1.7rem);font-weight:700;max-width:60ch;text-wrap:balance}
+.feedback .yes{color:var(--ok);font-family:var(--display);font-weight:800}
+.feedback .no{color:var(--bad);font-family:var(--display);font-weight:800}
+.feedback .note{display:block;font-size:.8em;color:var(--muted);font-weight:600;margin-top:4px}
+.primary{background:var(--c);color:var(--card);border:0;border-radius:16px;padding:14px 26px;font-family:var(--display);font-weight:800;font-size:1.35rem}
+.primary:hover{filter:brightness(1.08)}
+
+/* End screen */
+.end h2{font-family:var(--display);font-weight:800;font-size:clamp(2rem,5vw,3.4rem);margin:0;line-height:1.1;text-wrap:balance}
+.end p{margin:0;font-size:1.3rem;color:var(--muted);font-weight:600}
+.stars{display:flex;gap:10px;justify-content:center}
+.stars svg{width:clamp(64px,10vw,104px);height:auto}
+.teams-result{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.teams-result div{min-width:180px;padding:16px 22px;border-radius:20px;background:color-mix(in srgb,var(--tc) 13%,var(--card));color:var(--tc);font-weight:800}
+.teams-result b{display:block;font-family:var(--display);font-size:3rem;line-height:1}
+.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+@keyframes pop{50%{transform:scale(1.06)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:720px){
+  .setup{grid-template-columns:1fr}
+  .answers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .opt{min-height:76px;padding:14px 8px}
+}
+</style>
+
+<div class="wrap">
+  <section id="home">
+    <header class="brand">
+      <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
+        <rect x="2" y="2" width="50" height="50" rx="14" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+        <circle cx="16" cy="18" r="6" fill="var(--math)"/>
+        <rect x="31" y="12" width="12" height="12" rx="3" fill="var(--lang)"/>
+        <path d="M27 42 L19 30 L35 30 Z" fill="var(--nature)"/>
+      </svg>
+      <div>
+        <h1>Quvnoq Sinf</h1>
+        <p>Boshlang‘ich sinflar uchun o‘yinli darslar</p>
+      </div>
+    </header>
+
+    <div class="setup">
+      <div>
+        <h2>Sinf</h2>
+        <div class="chips" id="gradeChips"></div>
+      </div>
+      <div>
+        <h2>O‘yin tartibi</h2>
+        <div class="chips" id="modeChips">
+          <button class="chip" id="modeAll" data-teams="0">Butun sinf</button>
+          <button class="chip" id="modeTeams" data-teams="1">Ikki jamoa</button>
+        </div>
+      </div>
+      <p class="tip">Proyektorda oching va <b>Katta ekran</b> tugmasini bosing. Bolalar javobni aytadi, siz bosasiz. Javobni klaviaturadagi <b>1–4</b> raqamlari bilan ham tanlash mumkin, <b>Enter</b> keyingi savolga o‘tkazadi. Har bir o‘yin 10 ta savoldan iborat, savollar har safar yangidan tuziladi.</p>
+    </div>
+
+    <div id="subjects"></div>
+  </section>
+
+  <section id="game" hidden>
+    <div class="gbar">
+      <button class="ghost" id="backBtn">← Bosh sahifa</button>
+      <div class="gtitle"><span id="gSubject"></span><strong id="gName"></strong></div>
+      <div class="gtools">
+        <span class="pill" id="progressTxt"></span>
+        <span id="scoreBox" class="gtools"></span>
+        <button class="ghost" id="soundBtn" aria-label="Ovozni yoqish yoki o‘chirish"></button>
+        <button class="ghost" id="fsBtn">Katta ekran</button>
+      </div>
+    </div>
+    <div class="progress"><i id="pbar"></i></div>
+    <div class="board" id="board"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const store={
+  get(k,d){try{const v=localStorage.getItem("qs_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("qs_"+k,JSON.stringify(v))}catch(e){}}
+};
+const S={grade:store.get("grade",1),teams:store.get("teams",false),sound:store.get("sound",true)};
+if(![1,2,3,4].includes(S.grade))S.grade=1;
+
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function numOpts(ans){
+  const set=new Set([ans]);
+  const steps=ans>=100?[1,10,2,20,100,5]:ans>=20?[1,10,2,5,3]:[1,2,3];
+  for(let g=0;set.size<4&&g<60;g++){const v=ans+pick(steps)*(Math.random()<.5?-1:1);if(v>=0)set.add(v)}
+  for(let k=1;set.size<4;k++)set.add(ans+k);
+  return shuffle([...set]).map(String);
+}
+
+/* ---------- Matematika ---------- */
+function genHisob(g){
+  let a,b,op,ans;
+  if(g===1){if(Math.random()<.5){op="+";a=rnd(0,9);b=rnd(1,10-a)}else{op="−";a=rnd(2,10);b=rnd(1,a)}}
+  else if(g===2){if(Math.random()<.5){op="+";a=rnd(11,79);b=rnd(5,99-a)}else{op="−";a=rnd(25,99);b=rnd(5,a-5)}}
+  else if(g===3){if(Math.random()<.6){op="×";a=rnd(2,9);b=rnd(2,9)}else{op="÷";b=rnd(2,9);ans=rnd(2,9);a=b*ans}}
+  else{const r=Math.random();
+    if(r<.3){op="+";a=rnd(120,780);b=rnd(110,999-a)}
+    else if(r<.55){op="−";a=rnd(300,999);b=rnd(100,a-50)}
+    else if(r<.8){op="×";a=rnd(12,49);b=rnd(2,9)}
+    else{op="÷";b=rnd(2,9);ans=rnd(11,30);a=b*ans}}
+  if(op==="+")ans=a+b;else if(op==="−")ans=a-b;else if(op==="×")ans=a*b;
+  return{key:a+op+b,ask:"Hisoblang",prompt:`<span class="expr">${a} ${op} ${b} = <span class="blank">?</span></span>`,options:numOpts(ans),answer:String(ans)};
+}
+const COUNT_EMO=["🍎","⭐","🐟","🌸","🎈","🐥","🍓","🦋","🍐","🐞"];
+function genSanash(g){
+  const e=pick(COUNT_EMO);
+  if(g<=2){
+    const n=g===1?rnd(2,10):rnd(8,20);
+    return{key:e+n,ask:"Nechta?",prompt:`<div class="count-pile">${Array(n).fill(`<span>${e}</span>`).join("")}</div>`,options:numOpts(n),answer:String(n)};
+  }
+  const r=g===3?rnd(2,5):rnd(3,6),c=g===3?rnd(2,6):rnd(4,9),n=r*c;
+  return{key:e+r+"x"+c,ask:`Nechta? <small>${r} ta qator, har birida ${c} tadan</small>`,
+    prompt:`<div class="count-grid">${Array(r).fill(`<div>${Array(c).fill(`<span>${e}</span>`).join("")}</div>`).join("")}</div>`,
+    options:numOpts(n),answer:String(n),explain:`${r} × ${c} = ${n}`};
+}
+function genTaqqos(g){
+  let L,R,lv,rv,note="";
+  const eq=Math.random()<.2;
+  if(g<=2){
+    const max=g===1?20:100;lv=rnd(0,max);rv=eq?lv:rnd(0,max);if(!eq&&rv===lv)rv=lv+1;L=String(lv);R=String(rv);
+  }else if(g===3||Math.random()<.5){
+    let a,b,op;
+    if(g===3){if(Math.random()<.6){op="×";a=rnd(2,9);b=rnd(2,9);lv=a*b}else{op="+";a=rnd(15,60);b=rnd(10,39);lv=a+b}}
+    else{if(Math.random()<.5){op="×";a=rnd(12,40);b=rnd(2,9);lv=a*b}else{op="+";a=rnd(150,600);b=rnd(120,399);lv=a+b}}
+    rv=eq?lv:lv+pick(g===3?[-3,-2,-1,1,2,3]:[-20,-10,-1,1,10,20]);
+    L=`${a} ${op} ${b}`;R=String(rv);note=`${L} = ${lv}`;
+  }else{
+    lv=rnd(1000,9999);
+    let s;for(let t=0;t<10;t++){s=shuffle(String(lv).split("")).join("");if(s[0]!=="0")break}
+    if(s[0]==="0")s=String(lv);
+    rv=eq?lv:Number(s);if(!eq&&rv===lv)rv=lv+10>9999?lv-10:lv+10;
+    L=String(lv);R=String(rv);
+  }
+  const ans=lv<rv?"<":lv>rv?">":"=";
+  return{key:L+"|"+R,ask:"Qaysi belgi qo‘yiladi?",prompt:`<span class="expr">${L} <span class="blank">?</span> ${R}</span>`,
+    options:["<","=",">"],keepOrder:true,answer:ans,explain:`${L} ${ans} ${R}`+(note?` (chunki ${note})`:"")};
+}
+
+/* ---------- Ona tili ---------- */
+const WORDS=[["olma","🍎"],["uzum","🍇"],["it","🐶"],["mushuk","🐱"],["qush","🐦"],["baliq","🐟"],["quyosh","☀️"],["oy","🌙"],["yulduz","⭐"],["gul","🌸"],["daraxt","🌳"],["kitob","📖"],["qalam","✏️"],["uy","🏠"],["mashina","🚗"],["sigir","🐄"],["ot","🐴"],["tovuq","🐔"],["quyon","🐰"],["ayiq","🐻"],["sher","🦁"],["fil","🐘"],["tarvuz","🍉"],["non","🍞"],["sut","🥛"],["soat","⌚"],["kalit","🔑"],["to‘p","⚽"],["shar","🎈"],["qor","❄️"],["bulut","☁️"],["tuxum","🥚"],["limon","🍋"],["nok","🍐"],["sabzi","🥕"],["pomidor","🍅"],["kema","🚢"],["avtobus","🚌"],["eshik","🚪"],["qoshiq","🥄"],["maktab","🏫"],["toshbaqa","🐢"],["ari","🐝"],["kapalak","🦋"],["ilon","🐍"],["tulki","🦊"],["bo‘ri","🐺"],["echki","🐐"],["qo‘y","🐑"],["tuya","🐪"],["maymun","🐒"],["kompyuter","💻"],["televizor","📺"],["velosiped","🚲"],["qulupnay","🍓"],["kartoshka","🥔"],["samolyot","✈️"],["qo‘ziqorin","🍄"],["sichqon","🐭"],["qurbaqa","🐸"]];
+const DIGRAPHS=["o‘","g‘","sh","ch"];
+const VOWELS=["a","e","i","o","u","o‘"];
+const CONS=["b","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","x","y","z","g‘","sh","ch"];
+function units(w){const out=[];for(let i=0;i<w.length;){const two=w.slice(i,i+2);if(DIGRAPHS.includes(two)){out.push(two);i+=2}else{out.push(w[i]);i++}}return out}
+const RANGE={1:[2,4],2:[3,5],3:[4,7],4:[5,99]};
+function wordsFor(g){const[a,b]=RANGE[g];return WORDS.filter(([w])=>{const n=units(w).length;return n>=a&&n<=b})}
+const vowelHTML=w=>units(w).map(u=>VOWELS.includes(u)?`<span class="v">${u}</span>`:u).join("");
+
+function genHarf(g){
+  const[w,e]=pick(wordsFor(g)),u=units(w),idx=rnd(0,u.length-1),ans=u[idx];
+  const pool=(VOWELS.includes(ans)?VOWELS:CONS).filter(x=>x!==ans);
+  const opts=shuffle([ans,...shuffle(pool).slice(0,3)]);
+  const shown=u.map((x,i)=>i===idx?`<span class="blank">?</span>`:x).join("");
+  return{key:w+idx,ask:"Qaysi harf tushib qolgan?",prompt:`<div class="pic">${e}</div><div class="word">${shown}</div>`,options:opts,answer:ans,explain:`So‘z: <b>${w}</b>`};
+}
+function genSoz(g){
+  const[w,e]=pick(wordsFor(g)),u=units(w);
+  let t=shuffle(u);for(let k=0;k<10&&t.join("")===u.join("")&&u.length>1;k++)t=shuffle(u);
+  return{key:w,kind:"build",ask:"Harflardan so‘z tuzing",prompt:`<div class="pic">${e}</div>`,answer:u,tiles:t,answerLabel:w};
+}
+function genBogin(g){
+  const[w,e]=pick(wordsFor(g)),n=units(w).filter(x=>VOWELS.includes(x)).length;
+  const opts=(g<=2?[1,2,3,4]:[1,2,3,4,5]).map(String);
+  return{key:w,ask:"Bu so‘zda nechta bo‘g‘in bor?",prompt:`<div class="pic">${e}</div><div class="word">${w}</div>`,options:opts,keepOrder:true,answer:String(n),
+    explain:`<span class="word" style="font-size:1.3em">${vowelHTML(w)}</span><br>Unli harflar soni = bo‘g‘inlar soni: ${n} ta`};
+}
+
+/* ---------- Tabiatshunoslik ---------- */
+const HAB={orm:["🌲","O‘rmon"],suv:["🌊","Suv"],chol:["🏜️","Cho‘l"],qutb:["🧊","Muzlik"],uy:["🏡","Ferma"]};
+const ANIMALS=[
+["🐻","Ayiq","orm","Ayiq o‘rmonda yashaydi, qishda inida uxlaydi."],
+["🦊","Tulki","orm","Tulki o‘rmon va dalalarda in qazib yashaydi."],
+["🐺","Bo‘ri","orm","Bo‘rilar o‘rmonda to‘da bo‘lib yashaydi."],
+["🦌","Bug‘u","orm","Bug‘ular o‘rmonda o‘t va barglar bilan oziqlanadi."],
+["🐿️","Olmaxon","orm","Olmaxon daraxt kovagida yashaydi va yong‘oq g‘amlaydi."],
+["🦉","Boyqush","orm","Boyqush tunda ov qiladigan o‘rmon qushi."],
+["🐟","Baliq","suv","Baliq suvda jabrasi bilan nafas oladi."],
+["🐋","Kit","suv","Kit okeanda yashaydi, u eng katta hayvon."],
+["🐬","Delfin","suv","Delfin dengizda yashaydi va juda aqlli."],
+["🐙","Sakkizoyoq","suv","Sakkizoyoqning 8 ta oyog‘i bor, u dengiz tubida yashaydi."],
+["🦈","Akula","suv","Akula dengiz va okeanlarda yashaydi."],
+["🐪","Tuya","chol","Tuya cho‘lda ko‘p kun suv ichmasdan yura oladi."],
+["🦎","Kaltakesak","chol","Kaltakesak issiq qumli cho‘lda yashaydi."],
+["🦂","Chayon","chol","Chayon cho‘lda tosh ostida yashaydi."],
+["🐧","Pingvin","qutb","Pingvinlar Antarktidaning muzli qirg‘oqlarida yashaydi."],
+["🐻‍❄️","Oq ayiq","qutb","Oq ayiq Shimoliy qutb muzliklarida yashaydi."],
+["🦭","Tyulen","qutb","Tyulen sovuq dengiz va muzliklarda yashaydi."],
+["🐄","Sigir","uy","Sigir fermada boqiladi va bizga sut beradi."],
+["🐔","Tovuq","uy","Tovuq hovlida yashaydi va tuxum qo‘yadi."],
+["🐑","Qo‘y","uy","Qo‘y fermada boqiladi, undan jun olinadi."],
+["🐐","Echki","uy","Echki hovlida boqiladi va sut beradi."],
+["🐴","Ot","uy","Ot fermada boqiladi va odamlarga yordam beradi."]];
+function genYashash(){
+  const[e,n,h,fact]=pick(ANIMALS);
+  const others=shuffle(Object.keys(HAB).filter(k=>k!==h)).slice(0,3);
+  const opts=shuffle([h,...others]).map(k=>({v:k,html:`${HAB[k][0]} ${HAB[k][1]}`,text:true}));
+  return{key:n,ask:`${n} qayerda yashaydi?`,prompt:`<div class="pic">${e}</div>`,options:opts,answer:h,answerLabel:HAB[h][1],explain:fact};
+}
+const SEASONS={qish:["❄️","Qish","Qish: dekabr, yanvar, fevral. Havo sovuq, qor yog‘adi."],bahor:["🌷","Bahor","Bahor: mart, aprel, may. Navro‘z keladi, gullar ochiladi."],yoz:["☀️","Yoz","Yoz: iyun, iyul, avgust. Havo issiq, mevalar pishadi."],kuz:["🍂","Kuz","Kuz: sentabr, oktabr, noyabr. Barglar sarg‘ayadi, hosil yig‘iladi."]};
+const SEASON_ITEMS=[["☃️","Qor odam","qish"],["🎿","Chang‘i","qish"],["🧤","Qo‘lqop va sharf","qish"],["🎄","Yangi yil archasi","qish"],["🌷","Lola","bahor"],["🌸","Gullagan o‘rik","bahor"],["🌱","Yangi maysa","bahor"],["🐣","Jo‘ja","bahor"],["🍉","Tarvuz","yoz"],["🏖️","Suv bo‘yida dam olish","yoz"],["🍦","Muzqaymoq","yoz"],["🌻","Kungaboqar","yoz"],["🍁","Sarg‘aygan barglar","kuz"],["🍇","Uzum yig‘imi","kuz"],["🎒","Maktabga qaytish","kuz"],["🎃","Qovoq","kuz"]];
+function genFasl(){
+  const[e,n,s]=pick(SEASON_ITEMS);
+  const opts=["qish","bahor","yoz","kuz"].map(k=>({v:k,html:`${SEASONS[k][0]} ${SEASONS[k][1]}`,text:true}));
+  return{key:n,ask:`${n} qaysi faslga xos?`,prompt:`<div class="pic">${e}</div>`,options:opts,keepOrder:true,answer:s,answerLabel:SEASONS[s][1],explain:SEASONS[s][2]};
+}
+const KINDS={hayvon:["🐾","Hayvon","Hayvonlar nafas oladi, oziqlanadi, harakatlanadi va o‘sadi."],osimlik:["🌿","O‘simlik","O‘simliklar ham tirik: ular o‘sadi, suv ichadi va quyosh nuridan oziq oladi."],jonsiz:["🪨","Jonsiz narsa","Jonsiz narsalar o‘smaydi, nafas olmaydi va oziqlanmaydi."]};
+const KIND_ITEMS=[["🐱","Mushuk","hayvon"],["🐝","Ari","hayvon"],["🐢","Toshbaqa","hayvon"],["🦋","Kapalak","hayvon"],["🐸","Qurbaqa","hayvon"],["🐘","Fil","hayvon"],["🐌","Shilliqqurt","hayvon"],["🌳","Daraxt","osimlik"],["🌵","Kaktus","osimlik"],["🌻","Kungaboqar","osimlik"],["🌾","Bug‘doy","osimlik"],["🌷","Lola","osimlik"],["🍀","Beda","osimlik"],["🪨","Tosh","jonsiz"],["🚗","Mashina","jonsiz"],["📖","Kitob","jonsiz"],["⏰","Soat","jonsiz"],["✏️","Qalam","jonsiz"],["☁️","Bulut","jonsiz"],["🧸","O‘yinchoq ayiq","jonsiz"],["🤖","Robot","jonsiz"]];
+function genTirik(){
+  const[e,n,k]=pick(KIND_ITEMS);
+  const opts=Object.keys(KINDS).map(x=>({v:x,html:`${KINDS[x][0]} ${KINDS[x][1]}`,text:true}));
+  return{key:n,ask:`${n}: bu nima?`,prompt:`<div class="pic">${e}</div>`,options:opts,keepOrder:true,answer:k,answerLabel:KINDS[k][1],explain:KINDS[k][2]};
+}
+
+/* ---------- Registry ---------- */
+const SUBJ={math:{n:"Matematika",c:"var(--math)"},lang:{n:"Ona tili va o‘qish",c:"var(--lang)"},nature:{n:"Tabiatshunoslik",c:"var(--nature)"}};
+const LVL={1:"qisqa so‘zlar",2:"3–5 harfli so‘zlar",3:"uzunroq so‘zlar",4:"uzun so‘zlar"};
+const GAMES=[
+ {id:"hisob",subject:"math",title:"Tez hisob",sample:"7 + 5 = ?",gen:genHisob,desc:g=>({1:"10 gacha qo‘shish va ayirish",2:"100 gacha qo‘shish va ayirish",3:"Ko‘paytirish jadvali va bo‘lish",4:"Ko‘p xonali sonlar bilan amallar"})[g]},
+ {id:"sanash",subject:"math",title:"Sanab ko‘r",sample:"🍎🍎🍎🍎",gen:genSanash,desc:g=>({1:"Rasmdagi narsalarni sanash (10 gacha)",2:"20 gacha sanash",3:"Qator va ustunlar: ko‘paytirib sanash",4:"Katta guruhlarni ko‘paytirib sanash"})[g]},
+ {id:"taqqos",subject:"math",title:"Katta, kichik, teng",sample:"8 ? 5",gen:genTaqqos,desc:g=>({1:"20 gacha sonlarni solishtirish",2:"100 gacha sonlarni solishtirish",3:"Ifoda va sonni solishtirish",4:"Ko‘p xonali sonlar va ifodalar"})[g]},
+ {id:"harf",subject:"lang",title:"Harfni top",sample:"ol?a",gen:genHarf,desc:g=>`So‘zdagi tushib qolgan harfni toping. ${S.grade}-sinf: ${LVL[g]}`},
+ {id:"soz",subject:"lang",title:"So‘z tuz",sample:"t·i·k·o·b",gen:genSoz,desc:g=>`Aralash harflardan so‘z yig‘ing. ${S.grade}-sinf: ${LVL[g]}`},
+ {id:"bogin",subject:"lang",title:"Bo‘g‘inni sana",sample:"ki-tob",gen:genBogin,desc:()=>"So‘zda nechta bo‘g‘in borligini aniqlang"},
+ {id:"yashash",subject:"nature",title:"Kim qayerda yashaydi?",sample:"🐧 → 🧊",gen:genYashash,desc:()=>"Hayvonni yashash joyi bilan moslang: o‘rmon, suv, cho‘l, muzlik, ferma"},
+ {id:"fasl",subject:"nature",title:"To‘rt fasl",sample:"❄️🌷☀️🍂",gen:genFasl,desc:()=>"Rasm qaysi faslga tegishli ekanini toping"},
+ {id:"tirik",subject:"nature",title:"Tirik va jonsiz",sample:"🌳 🐱 🪨",gen:genTirik,desc:()=>"Hayvon, o‘simlik yoki jonsiz narsa ekanini ajrating"}
+];
+
+/* ---------- Home ---------- */
+function renderHome(){
+  $("#gradeChips").innerHTML=[1,2,3,4].map(g=>`<button class="chip" data-grade="${g}" aria-pressed="${g===S.grade}">${g}-sinf</button>`).join("");
+  $("#modeAll").setAttribute("aria-pressed",String(!S.teams));
+  $("#modeTeams").setAttribute("aria-pressed",String(S.teams));
+  $("#subjects").innerHTML=Object.keys(SUBJ).map(k=>{
+    const list=GAMES.filter(x=>x.subject===k);
+    return `<section class="subject" style="--c:${SUBJ[k].c}">
+      <div class="subject-head"><h2>${SUBJ[k].n}</h2><span>${list.length} ta o‘yin</span></div>
+      <div class="cards">${list.map(x=>`<button class="game-card" data-game="${x.id}">
+        <div class="sample">${x.sample}</div>
+        <div class="card-body"><strong>${x.title}</strong><small>${x.desc(S.grade)}</small><span class="go">Boshlash →</span></div>
+      </button>`).join("")}</div></section>`;
+  }).join("");
+}
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-grade]");if(g){S.grade=Number(g.dataset.grade);store.set("grade",S.grade);renderHome();return}
+  const m=e.target.closest("[data-teams]");if(m){S.teams=m.dataset.teams==="1";store.set("teams",S.teams);renderHome();return}
+  const c=e.target.closest("[data-game]");if(c)startGame(c.dataset.game);
+});
+
+/* ---------- Sound ---------- */
+let AC=null;
+function beep(ok){
+  if(!S.sound)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const now=AC.currentTime,notes=ok?[523.25,659.25,783.99]:[246.94,196];
+    notes.forEach((f,i)=>{const o=AC.createOscillator(),gn=AC.createGain(),t=now+i*.11;
+      o.type=ok?"triangle":"sine";o.frequency.value=f;
+      gn.gain.setValueAtTime(.0001,t);gn.gain.exponentialRampToValueAtTime(.22,t+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+.28);
+      o.connect(gn).connect(AC.destination);o.start(t);o.stop(t+.3)});
+  }catch(err){}
+}
+const SPK_ON='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>';
+const SPK_OFF='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+function renderSound(){$("#soundBtn").innerHTML=(S.sound?SPK_ON:SPK_OFF)+(S.sound?" Ovoz":" Ovozsiz")}
+$("#soundBtn").addEventListener("click",()=>{S.sound=!S.sound;store.set("sound",S.sound);renderSound()});
+$("#fsBtn").addEventListener("click",()=>{
+  try{if(document.fullscreenElement)document.exitFullscreen();else{const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(()=>{})}}catch(err){}
+});
+document.addEventListener("fullscreenchange",()=>{$("#fsBtn").textContent=document.fullscreenElement?"Kichik ekran":"Katta ekran"});
+
+/* ---------- Game ---------- */
+const PRAISE=["Barakalla!","Zo‘r!","Ofarin!","Juda yaxshi!","Qoyil!","To‘g‘ri!"];
+let R=null;
+function show(view){$("#home").hidden=view!=="home";$("#game").hidden=view!=="game";window.scrollTo(0,0)}
+$("#backBtn").addEventListener("click",()=>{R=null;show("home");renderHome()});
+
+function startGame(id){
+  const game=GAMES.find(x=>x.id===id);if(!game)return;
+  R={game,i:0,total:10,score:0,ts:[0,0],used:new Set(),q:null,done:false};
+  $("#game").style.setProperty("--c",SUBJ[game.subject].c);
+  $("#gSubject").textContent=SUBJ[game.subject].n+" · "+S.grade+"-sinf";
+  $("#gName").textContent=game.title;
+  renderSound();show("game");nextQ();
+}
+function makeQ(){for(let t=0;t<40;t++){const q=R.game.gen(S.grade);if(!R.used.has(q.key)){R.used.add(q.key);return q}}return R.game.gen(S.grade)}
+function team(){return R.i%2}
+function renderBar(){
+  $("#progressTxt").textContent=`${Math.min(R.i+1,R.total)} / ${R.total}`;
+  $("#pbar").style.width=`${(R.i+(R.done?1:0))/R.total*100}%`;
+  $("#scoreBox").innerHTML=S.teams
+    ?[0,1].map(t=>`<span class="pill team t${t+1}${!R.finished&&team()===t?" active":""}">${t+1}-jamoa: ${R.ts[t]}</span>`).join("")
+    :`<span class="pill">To‘g‘ri: ${R.score}</span>`;
+}
+function nextQ(){
+  R.q=makeQ();R.done=false;const q=R.q;
+  const b=$("#board");
+  b.innerHTML=`${S.teams?`<div class="turn t${team()+1}">Navbat: ${team()+1}-jamoa</div>`:""}
+    <p class="ask">${q.ask}</p><div class="prompt">${q.prompt}</div>
+    <div id="answers" class="${q.kind==="build"?"build":"answers"}"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <button class="primary" id="nextBtn" hidden>${R.i+1>=R.total?"Natijani ko‘rish":"Keyingi savol →"}</button>`;
+  $("#nextBtn").addEventListener("click",advance);
+  if(q.kind==="build")renderBuild(q);else renderChoice(q);
+  renderBar();
+}
+function renderChoice(q){
+  const box=$("#answers");
+  const opts=q.options.map(o=>typeof o==="string"?{v:o,html:o}:o);
+  box.innerHTML=opts.map((o,i)=>`<button class="opt${o.text?" text":""}" data-v="${o.v}"><kbd>${i+1}</kbd>${o.html}</button>`).join("");
+  box.querySelectorAll(".opt").forEach(btn=>btn.addEventListener("click",()=>choose(btn)));
+}
+function choose(btn){
+  if(!R||R.done)return;
+  const q=R.q,ok=btn.dataset.v===q.answer;
+  document.querySelectorAll("#answers .opt").forEach(b=>{b.disabled=true;if(b.dataset.v===q.answer)b.classList.add("ok");else if(b!==btn)b.classList.add("dim")});
+  if(!ok)btn.classList.add("bad");
+  finish(ok);
+}
+function renderBuild(q){
+  const box=$("#answers"),filled=Array(q.answer.length).fill(null);
+  function draw(){
+    box.innerHTML=`<div class="slots">${filled.map((t,i)=>`<button class="slot${t!==null?" full":""}" data-slot="${i}" aria-label="${i+1}-katak">${t!==null?q.tiles[t]:""}</button>`).join("")}</div>
+      <div class="tiles">${q.tiles.map((u,i)=>`<button class="tile" data-tile="${i}" ${filled.includes(i)?"disabled":""}>${u}</button>`).join("")}</div>
+      <button class="ghost" id="clearBtn">Tozalash</button>`;
+    box.querySelectorAll(".tile").forEach(b=>b.addEventListener("click",()=>{if(R.done)return;const s=filled.indexOf(null);if(s<0)return;filled[s]=Number(b.dataset.tile);check()}));
+    box.querySelectorAll(".slot").forEach(b=>b.addEventListener("click",()=>{if(R.done)return;filled[Number(b.dataset.slot)]=null;draw()}));
+    $("#clearBtn").addEventListener("click",()=>{if(R.done)return;filled.fill(null);draw()});
+  }
+  function check(){
+    draw();
+    if(filled.includes(null))return;
+    const ok=filled.map(i=>q.tiles[i]).join("")===q.answer.join("");
+    box.querySelectorAll(".slot").forEach(s=>s.classList.add(ok?"ok":"bad"));
+    box.querySelectorAll("button").forEach(b=>b.disabled=true);
+    $("#clearBtn").hidden=true;
+    finish(ok);
+  }
+  draw();
+}
+function finish(ok){
+  R.done=true;const q=R.q;
+  if(ok){R.score++;R.ts[team()]++}
+  beep(ok);
+  const label=q.answerLabel||q.answer;
+  $("#feedback").innerHTML=(ok?`<span class="yes">${pick(PRAISE)}</span>`:`<span class="no">Afsus.</span> To‘g‘ri javob: <b>${label}</b>`)
+    +(q.explain?`<span class="note">${q.explain}</span>`:"");
+  const n=$("#nextBtn");n.hidden=false;n.focus({preventScroll:true});
+  renderBar();
+}
+function advance(){
+  if(!R||!R.done)return;
+  R.i++;
+  if(R.i>=R.total)return renderEnd();
+  nextQ();
+}
+const STAR=on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="${on?"var(--star)":"var(--line)"}" stroke="${on?"var(--star)":"var(--line)"}" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+function renderEnd(){
+  R.finished=true;R.i=R.total-1;R.done=true;renderBar();
+  const b=$("#board");let top;
+  if(S.teams){
+    const[a,c]=R.ts,msg=a>c?"1-jamoa g‘olib!":c>a?"2-jamoa g‘olib!":"Durang! Ikkala jamoa ham zo‘r!";
+    top=`<h2>${msg}</h2><div class="teams-result"><div class="t1">1-jamoa<b>${a}</b>5 tadan</div><div class="t2">2-jamoa<b>${c}</b>5 tadan</div></div>`;
+  }else{
+    const p=R.score/R.total,stars=p>=.9?3:p>=.6?2:1;
+    const msg=stars===3?"Ajoyib! Barakalla!":stars===2?"Yaxshi natija!":"Yana bir bor urinib ko‘ramiz!";
+    top=`<div class="stars">${[0,1,2].map(i=>STAR(i<stars)).join("")}</div><h2>${msg}</h2><p>${R.total} ta savoldan ${R.score} tasiga to‘g‘ri javob berildi.</p>`;
+  }
+  b.innerHTML=`<div class="end board" style="border:0;padding:0">${top}<div class="actions"><button class="primary" id="againBtn">Yana o‘ynash</button><button class="ghost" id="otherBtn">Boshqa o‘yin</button></div></div>`;
+  if(R.score>=R.total*.6||S.teams)beep(true);
+  $("#againBtn").addEventListener("click",()=>startGame(R.game.id));
+  $("#otherBtn").addEventListener("click",()=>{R=null;show("home");renderHome()});
+  $("#againBtn").focus({preventScroll:true});
+}
+document.addEventListener("keydown",e=>{
+  if(!R||$("#game").hidden||R.finished)return;
+  if(!R.done&&/^[1-9]$/.test(e.key)){const opts=document.querySelectorAll("#answers .opt");const btn=opts[Number(e.key)-1];if(btn){e.preventDefault();choose(btn)}}
+  else if(R.done&&(e.key==="Enter"||e.key===" "||e.key==="ArrowRight")){e.preventDefault();advance()}
+});
+
+renderHome();
+})();
+</script>

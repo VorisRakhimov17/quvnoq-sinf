@@ -1,0 +1,62 @@
+// Quvnoq Sinf ma'lumotlar bazasi sxemasi
+// O'zgartirgandan keyin: npm run db:migrate
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// O'qituvchi akkaunti
+model Teacher {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  results      GameResult[]
+  questions    Question[]
+}
+
+enum Subject {
+  math   // Matematika
+  lang   // Ona tili va o'qish
+  nature // Tabiatshunoslik
+}
+
+/// Bitta o'yin raundi natijasi (10 ta savol)
+model GameResult {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  gameId    String
+  grade     Int
+  teams     Boolean  @default(false)
+  total     Int
+  score     Int
+  team1     Int?
+  team2     Int?
+  createdAt DateTime @default(now())
+
+  @@index([teacherId, createdAt])
+}
+
+/// O'qituvchi o'zi qo'shgan savol
+model Question {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subject   Subject
+  grade     Int
+  prompt    String
+  emoji     String?
+  options   String[]
+  answer    String
+  explain   String?
+  createdAt DateTime @default(now())
+
+  @@index([teacherId, subject, grade])
+}

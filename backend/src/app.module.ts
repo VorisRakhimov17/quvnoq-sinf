@@ -1,0 +1,30 @@
+import { Controller, Get, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { PrismaService } from './prisma/prisma.service';
+import { QuestionsModule } from './questions/questions.module';
+import { ResultsModule } from './results/results.module';
+
+@Controller('health')
+class HealthController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  @Get()
+  async check() {
+    await this.prisma.$queryRaw`SELECT 1`;
+    return { status: 'ok', db: 'ok', time: new Date().toISOString() };
+  }
+}
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    AuthModule,
+    ResultsModule,
+    QuestionsModule,
+  ],
+  controllers: [HealthController],
+})
+export class AppModule {}
