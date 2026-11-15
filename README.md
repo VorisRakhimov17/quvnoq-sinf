@@ -50,9 +50,13 @@ Kalit bo‘lmasa, bu bo‘lim o‘chiq turadi, qolgan qismlar ishlayveradi. Har 
 
 - 1 kredit = 1 AI o‘yin. Yangi o‘qituvchiga 5 ta bepul kredit (`WELCOME_CREDITS`, `backend/src/credits/credits.module.ts`).
 - AI xato qilsa, kredit avtomatik qaytariladi. Har bir harakat `CreditTx` jadvalida saqlanadi.
-- Paket narxlari va bog‘lanish (Telegram/telefon): `frontend/src/config.ts`.
-- Sotish hozircha qo‘lda: to‘lov kelgach admin `/admin` sahifasida kredit qo‘shadi.
-  Admin bo‘lish uchun emailingizni `backend/.env` dagi `ADMIN_EMAILS` ga yozing.
+- Paketlar va narxlar: `backend/src/purchases/purchases.service.ts` (`PACKAGES`).
+- Sotib olish: o‘qituvchi paketni tanlaydi → karta raqamiga to‘laydi → “Chekni yuborish” Telegram botni ochadi →
+  chek adminga ✅/❌ tugmalari bilan keladi → ✅ bosilganda kredit avtomatik tushadi va bot o‘qituvchiga xabar beradi.
+  Zaxira yo‘l: `/admin` sahifasidagi “Kutilayotgan to‘lovlar”.
+- `backend/.env`: `PAYMENT_CARD`, `PAYMENT_CARD_OWNER`, `TELEGRAM_BOT_TOKEN` (@BotFather), `TELEGRAM_ADMIN_IDS`
+  (botga /start yozing — u Telegram ID’ingizni aytadi), `ADMIN_EMAILS` (sayt admin sahifasi).
+- Bot long polling bilan ishlaydi: bitta token bilan faqat bitta joyda (lokal yoki server) ishga tushiring.
 
 ## Foydali buyruqlar
 
@@ -79,6 +83,10 @@ Barcha yo‘llar `/api` ostida. Belgilanganlari uchun `Authorization: Bearer <to
 | DELETE | `/api/questions/:id` | 🔒 savolni o‘chirish |
 | GET | `/api/ai/status` | 🔒 AI ulanganmi |
 | GET | `/api/credits` | 🔒 kredit balansi va tarixi |
+| GET | `/api/purchases/config` | 🔒 paketlar, karta, bot |
+| GET/POST | `/api/purchases` | 🔒 mening buyurtmalarim / yangi buyurtma |
+| GET | `/api/admin/purchases` | 🔒👑 kutilayotgan to‘lovlar |
+| POST | `/api/admin/purchases/:id` | 🔒👑 tasdiqlash yoki rad etish |
 | GET | `/api/admin/teachers` | 🔒👑 o‘qituvchilar ro‘yxati |
 | POST | `/api/admin/credits` | 🔒👑 kredit qo‘shish/ayirish |
 | POST | `/api/ai/generate` | 🔒 mavzu bo‘yicha savollar yaratish (1 kredit, saqlamaydi) |

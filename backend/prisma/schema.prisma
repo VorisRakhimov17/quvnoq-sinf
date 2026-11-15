@@ -22,6 +22,32 @@ model Teacher {
   results      GameResult[]
   questions    Question[]
   creditTxs    CreditTx[]
+  purchases    Purchase[]
+}
+
+enum PurchaseStatus {
+  pending   // yaratildi, chek kutilmoqda
+  submitted // chek Telegram orqali yuborildi, admin tekshiradi
+  approved  // tasdiqlandi, kredit qo'shildi
+  rejected  // rad etildi
+}
+
+/// Kredit paketini sotib olish so'rovi (karta orqali to'lov + Telegram'da chek)
+model Purchase {
+  id         Int            @id @default(autoincrement())
+  code       String         @unique // botga /start bilan yuboriladigan qisqa kod
+  teacherId  Int
+  teacher    Teacher        @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  credits    Int
+  price      Int            // so'mda
+  status     PurchaseStatus @default(pending)
+  tgChatId   String?        // chek yuborgan Telegram chat
+  receiptId  String?        // Telegram file_id (chek rasmi)
+  createdAt  DateTime       @default(now())
+  decidedAt  DateTime?
+
+  @@index([status, createdAt])
+  @@index([teacherId, createdAt])
 }
 
 enum CreditReason {

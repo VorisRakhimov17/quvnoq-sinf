@@ -19,7 +19,8 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 
 ## Kreditlar (pullik model)
 - 1 kredit = 1 AI o'yin; yangi o'qituvchiga 5 bepul. Narx o'lchovi (2026-11-15, claude-opus-5-5): 10 savol ≈ 900 in / 2200 out token ≈ $0.047, 15 savol ≈ $0.07.
-- Paketlar: 10 — 15 000, 30 — 39 000, 100 — 119 000 so'm (`frontend/src/config.ts`). To'lov hozircha qo'lda, admin `/admin` dan qo'shadi; keyin Payme/Click integratsiyasi rejada.
+- Paketlar: 10 — 15 000, 30 — 39 000, 100 — 119 000 so'm (`backend/src/purchases/purchases.service.ts`).
+- To'lov: karta + chek Telegram botga (`purchases/telegram.service.ts`, long polling, fetch). Admin ✅ bosadi → `PurchasesService.decide` (bir martalik, atomik) → kredit. Zaxira: `/admin`. Keyin Payme/Click integratsiyasi mumkin.
 - Admin: `ADMIN_EMAILS` (.env). `CreditsService.spend` atomik; AI xatosida `refund`.
 
 ## Lokal muhit

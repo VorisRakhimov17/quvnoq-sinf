@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
+  app.enableShutdownHooks(); // Telegram bot pollingini to'g'ri to'xtatish uchun
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const origins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')

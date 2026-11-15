@@ -225,3 +225,23 @@ td.minus { color: var(--muted); }
 .num-in { width: 5.5em; background: var(--paper); border: 2px solid var(--line); border-radius: 10px; padding: 4px 8px; font-weight: 700; }
 .ok-msg { color: var(--ok); font-weight: 800; margin: 0; }
 @media (max-width: 720px) { .packages { grid-template-columns: 1fr; } }
+
+/* Sotib olish */
+button.package { text-align: left; font: inherit; color: inherit; background: transparent; cursor: pointer; }
+.package.selected { border-color: var(--c, var(--nature)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nature) 35%, transparent); }
+.buy-btn { align-self: flex-start; --c: var(--nature); }
+.pay-steps { display: flex; flex-direction: column; gap: 12px; border: 2px solid var(--line); border-radius: 18px; padding: 16px; --c: var(--nature); }
+.pay-step { display: flex; gap: 14px; align-items: flex-start; }
+.pay-step > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pay-step p { margin: 0; }
+.step-n { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--nature); color: var(--card); display: grid; place-items: center; font-family: var(--display); font-weight: 800; }
+.card-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.card-no { font-size: 1.4rem; font-weight: 800; letter-spacing: .06em; background: var(--paper); border: 2px dashed var(--line); border-radius: 12px; padding: 6px 12px; }
+.tg-btn { align-self: flex-start; --c: #2AABEE; }
+.my-orders ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.my-orders li { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.status { font-weight: 800; }
+.status.approved { color: var(--ok); }
+.status.rejected { color: var(--bad); }
+.status.pending, .status.submitted { color: var(--muted); }
+.orders li { flex-wrap: wrap; }
