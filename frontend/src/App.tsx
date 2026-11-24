@@ -13,15 +13,11 @@ import { useSettings } from './settings';
 export function Logo() {
   return (
     <svg viewBox="0 0 54 54" aria-hidden="true">
-      <defs>
-        <linearGradient id="lg-logo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#7B5CFF" /><stop offset="1" stopColor="#FF7A59" />
-        </linearGradient>
-      </defs>
-      <rect x="1" y="1" width="52" height="52" rx="16" fill="url(#lg-logo)" />
-      <circle cx="18" cy="20" r="6" fill="#fff" />
-      <rect x="30" y="14" width="12" height="12" rx="3.5" fill="#FFD25A" />
-      <path d="M14 34 Q27 46 40 34" fill="none" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" />
+      {/* Daftar varag'i: doska yashili fon, sariq qalam, qizil olma, tabassum */}
+      <rect x="1" y="1" width="52" height="52" rx="14" fill="#1F6B5F" />
+      <circle cx="18" cy="20" r="6" fill="#D9533A" />
+      <rect x="30" y="14" width="12" height="12" rx="3" fill="#F2B632" />
+      <path d="M14 34 Q27 45 40 34" fill="none" stroke="#FAF6EC" strokeWidth="4.5" strokeLinecap="round" />
     </svg>
   );
 }
