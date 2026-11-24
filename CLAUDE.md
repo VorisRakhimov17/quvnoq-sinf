@@ -18,6 +18,12 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 ## AI (mavzu bo'yicha o'yin)
 - `backend/src/ai/ai.module.ts`: `@anthropic-ai/sdk`, `beta.messages.parse` + zod sxema, `fallbacks: 'default'`. Kalit `ANTHROPIC_API_KEY` (.env). Savollar `topic` maydoni bilan saqlanadi; o'yin: `/oyin/mening-<fan>?mavzu=<mavzu>`.
 
+## Prezentatsiyalar
+- `backend/src/presentations/presentations.module.ts`: AI tekis (flat) slayd sxemasini qaytaradi (union sxema "compiled grammar is too large" xatosini berdi), `toSlide()` aniq turlarga o'giradi. Frontend turlari: `frontend/src/deck/types.ts` — ikkalasi mos bo'lishi shart.
+- Takrorlanmaslik: `FRAMES` (syujet) va `MOODS` (rang) tasodifiy, oxirgi 8 ta `style` dan qochiladi. Slayd ko'rinishi varianti `hash(title+index)` dan.
+- Narx 3 kredit (14 slayd ≈ $0.18, 2026-11-24 o'lchov). Streaming + `finalMessage()`, `max_tokens` 48000.
+- SVG: backend xavfli belgisi borini tashlaydi, frontend `Art.tsx` oq ro'yxat bilan tozalaydi.
+
 ## Kreditlar (pullik model)
 - 1 kredit = 1 AI o'yin; yangi o'qituvchiga 5 bepul. Narx o'lchovi (2026-11-15, claude-opus-5-5): 10 savol ≈ 900 in / 2200 out token ≈ $0.047, 15 savol ≈ $0.07.
 - Paketlar: 10 — 15 000, 30 — 39 000, 100 — 119 000 so'm (`backend/src/purchases/purchases.service.ts`).

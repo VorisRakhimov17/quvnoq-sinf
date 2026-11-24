@@ -1,3 +1,4 @@
+import type { Presentation, PresentationRow } from './deck/types';
 import type { SubjectId } from './games/types';
 
 const TOKEN_KEY = 'qs_token';
@@ -82,6 +83,13 @@ export const api = {
   aiStatus: () => request<{ enabled: boolean }>('/ai/status'),
   aiGenerate: (p: { subject: SubjectId; grade: number; topic: string; count: number }) =>
     request<{ questions: GeneratedQuestion[]; credits: number }>('/ai/generate', 'POST', p),
+
+  deckCost: () => request<{ cost: number }>('/presentations/cost'),
+  decks: () => request<PresentationRow[]>('/presentations'),
+  deck: (id: number) => request<Presentation>(`/presentations/${id}`),
+  deleteDeck: (id: number) => request<{ deleted: boolean }>(`/presentations/${id}`, 'DELETE'),
+  generateDeck: (p: { subject: SubjectId; grade: number; topic: string; size: 'short' | 'normal' | 'long'; wishes?: string }) =>
+    request<{ id: number; credits: number }>('/presentations/generate', 'POST', p),
 
   credits: () => request<{ credits: number; history: CreditTx[] }>('/credits'),
   purchaseConfig: () => request<PurchaseConfig>('/purchases/config'),

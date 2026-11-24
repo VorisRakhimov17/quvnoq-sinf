@@ -98,7 +98,7 @@ export function BuyBox({ onChange }: { onChange?: () => void }) {
             <div>
               <strong>{formatSum(order.price)} ni shu kartaga o‘tkazing</strong>
               <div className="card-row">
-                <code className="card-no">{cfg.card.replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, '$1 ')}</code>
+                <code className="card-no">{(cfg.card ?? '').replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, '$1 ')}</code>
                 <button className="ghost small" onClick={copy}>{copied ? 'Nusxalandi ✓' : 'Nusxalash'}</button>
               </div>
               {cfg.owner && <small className="muted">Karta egasi: {cfg.owner}</small>}

@@ -46,6 +46,18 @@ Kabinetdagi “✨ Mavzu bo‘yicha o‘yin” bo‘limi Claude API (`claude-opu
 Yoqish uchun `backend/.env` ga `ANTHROPIC_API_KEY=...` yozing (kalit: https://console.anthropic.com → API Keys) va backendni qayta ishga tushiring.
 Kalit bo‘lmasa, bu bo‘lim o‘chiq turadi, qolgan qismlar ishlayveradi. Har bir o‘qituvchiga kuniga 30 ta yaratish limiti bor (`backend/src/ai/ai.module.ts`).
 
+## Dars prezentatsiyasi
+
+Kabinetdagi “🎬 Prezentatsiya” bo‘limi mavzu bo‘yicha to‘liq dars slaydlarini yaratadi: muqova, topishmoq, hikoya,
+tushuntirish, qadamlar, ishlangan misollar, taqqoslash, “Bilasizmi?”, savollar (A–D), taymerli faollik, xulosa.
+- Har safar boshqa syujet (kosmik sayohat, detektiv, Ipak yo‘li…) va rang kayfiyati tanlanadi; o‘qituvchining oxirgi
+  8 ta prezentatsiyasi uslubi takrorlanmaydi. AI palitra, shrift, naqsh, harakat va 3–5 ta SVG rasm chizadi.
+- Narxi 3 kredit (`PRESENTATION_COST`, `backend/src/presentations/presentations.module.ts`). O‘lchov: 14 slayd ≈
+  3 000 kirish / 8 300 chiqish token ≈ $0.18, ~80 soniya.
+- Ko‘rsatish: `/prezentatsiya/:id`. Klavishlar: → / probel — keyingi (avval misol qadamlari va javob ochiladi),
+  ← — oldingi, 1–4 — savolga javob, F — to‘liq ekran, N — o‘qituvchi izohi, G — barcha slaydlar, Esc — chiqish.
+- Kod: `frontend/src/deck/` (SlideView — slayd turlari, Motif — fon naqshi, Art — SVG oq ro‘yxat bilan tozalanadi).
+
 ## Kreditlar
 
 - 1 kredit = 1 AI o‘yin. Yangi o‘qituvchiga 5 ta bepul kredit (`WELCOME_CREDITS`, `backend/src/credits/credits.module.ts`).
@@ -90,3 +102,6 @@ Barcha yo‘llar `/api` ostida. Belgilanganlari uchun `Authorization: Bearer <to
 | GET | `/api/admin/teachers` | 🔒👑 o‘qituvchilar ro‘yxati |
 | POST | `/api/admin/credits` | 🔒👑 kredit qo‘shish/ayirish |
 | POST | `/api/ai/generate` | 🔒 mavzu bo‘yicha savollar yaratish (1 kredit, saqlamaydi) |
+| POST | `/api/presentations/generate` | 🔒 prezentatsiya yaratish va saqlash (3 kredit) |
+| GET | `/api/presentations`, `/api/presentations/:id` | 🔒 mening prezentatsiyalarim / bittasi |
+| DELETE | `/api/presentations/:id` | 🔒 o‘chirish |

@@ -23,6 +23,7 @@ model Teacher {
   questions    Question[]
   creditTxs    CreditTx[]
   purchases    Purchase[]
+  presentations Presentation[]
 }
 
 enum PurchaseStatus {
@@ -112,4 +113,22 @@ model Question {
 
   @@index([teacherId, subject, grade])
   @@index([teacherId, topic])
+}
+
+/// AI tayyorlagan dars prezentatsiyasi (slaydlar JSON ko'rinishida)
+model Presentation {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subject   Subject
+  grade     Int
+  topic     String
+  title     String
+  /// Uslub nomi (takrorlanmasligi uchun keyingi so'rovda AI ga aytiladi)
+  style     String
+  /// { theme, mascot, slides[] }
+  deck      Json
+  createdAt DateTime @default(now())
+
+  @@index([teacherId, createdAt])
 }

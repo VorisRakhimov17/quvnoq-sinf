@@ -23,11 +23,33 @@ import { JwtAuthGuard, TeacherId } from '../auth/jwt.guard';
 import { CreditsService, GAME_COST } from '../credits/credits.module';
 
 const SUBJECTS = ['math', 'lang', 'nature'] as const;
-const SUBJECT_NAMES: Record<Subject, string> = {
+export const SUBJECT_NAMES: Record<Subject, string> = {
   math: 'Matematika',
   lang: 'Ona tili va o‘qish',
   nature: 'Tabiatshunoslik (Atrofimizdagi olam)',
 };
+
+/** Anthropic SDK xatosini o'qituvchiga tushunarli HTTP xatoga aylantiradi */
+export function aiError(e: unknown, log: Logger): unknown {
+  if (e instanceof Anthropic.AuthenticationError) {
+    return new ServiceUnavailableException('API kalit noto‘g‘ri yoki o‘chirilgan. backend/.env ni tekshiring.');
+  }
+  if (e instanceof Anthropic.PermissionDeniedError) {
+    return new ServiceUnavailableException('API kalitda ruxsat yo‘q (balansni tekshiring).');
+  }
+  if (e instanceof Anthropic.RateLimitError) {
+    return new HttpException('AI hozir band. Bir daqiqadan keyin qayta urinib ko‘ring.', HttpStatus.TOO_MANY_REQUESTS);
+  }
+  if (e instanceof Anthropic.BadRequestError) {
+    log.error(`Bad request: ${e.message}`);
+    return new BadGatewayException('AI so‘rovni qabul qilmadi. Balans tugagan bo‘lishi mumkin.');
+  }
+  if (e instanceof Anthropic.APIError) {
+    log.error(`API error ${e.status}: ${e.message}`);
+    return new BadGatewayException('AI xizmatida xatolik. Birozdan keyin qayta urinib ko‘ring.');
+  }
+  return e;
+}
 
 /** Bir o'qituvchi bir kunda nechta marta yaratishi mumkin (xarajatni cheklash uchun) */
 const DAILY_LIMIT = 30;
@@ -143,24 +165,7 @@ Savollar soni: ${dto.count}`;
         messages: [{ role: 'user', content: user }],
       });
     } catch (e) {
-      if (e instanceof Anthropic.AuthenticationError) {
-        throw new ServiceUnavailableException('API kalit noto‘g‘ri yoki o‘chirilgan. backend/.env ni tekshiring.');
-      }
-      if (e instanceof Anthropic.PermissionDeniedError) {
-        throw new ServiceUnavailableException('API kalitda ruxsat yo‘q (balansni tekshiring).');
-      }
-      if (e instanceof Anthropic.RateLimitError) {
-        throw new HttpException('AI hozir band. Bir daqiqadan keyin qayta urinib ko‘ring.', HttpStatus.TOO_MANY_REQUESTS);
-      }
-      if (e instanceof Anthropic.BadRequestError) {
-        this.log.error(`Bad request: ${e.message}`);
-        throw new BadGatewayException('AI so‘rovni qabul qilmadi. Balans tugagan bo‘lishi mumkin.');
-      }
-      if (e instanceof Anthropic.APIError) {
-        this.log.error(`API error ${e.status}: ${e.message}`);
-        throw new BadGatewayException('AI xizmatida xatolik. Birozdan keyin qayta urinib ko‘ring.');
-      }
-      throw e;
+      throw aiError(e, this.log);
     }
 
     const u = res.usage;
