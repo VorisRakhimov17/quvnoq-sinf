@@ -13,11 +13,11 @@ import { useSettings } from './settings';
 export function Logo() {
   return (
     <svg viewBox="0 0 54 54" aria-hidden="true">
-      {/* Daftar varag'i: doska yashili fon, sariq qalam, qizil olma, tabassum */}
-      <rect x="1" y="1" width="52" height="52" rx="14" fill="#1F6B5F" />
-      <circle cx="18" cy="20" r="6" fill="#D9533A" />
-      <rect x="30" y="14" width="12" height="12" rx="3" fill="#F2B632" />
-      <path d="M14 34 Q27 45 40 34" fill="none" stroke="#FAF6EC" strokeWidth="4.5" strokeLinecap="round" />
+      {/* Ko'k daftar: to'q ko'k fon, qizil olma, sariq qalam, tabassum */}
+      <rect x="1" y="1" width="52" height="52" rx="14" fill="#1E3A8A" />
+      <circle cx="18" cy="20" r="6" fill="#DC2626" />
+      <rect x="30" y="14" width="12" height="12" rx="3" fill="#FBBF24" />
+      <path d="M14 34 Q27 45 40 34" fill="none" stroke="#FFFFFF" strokeWidth="4.5" strokeLinecap="round" />
     </svg>
   );
 }

@@ -1,17 +1,18 @@
 /* Quvnoq Sinf — dizayn tizimi.
-   Asosiy rang --brand (doska yashili), fanlar: --math, --lang, --nature. Komponent rangi --c (odatda fan yoki brand).
+   Asosiy rang --brand (to'q ko'k siyoh), fanlar: --math, --lang, --nature. Komponent rangi --c (odatda fan yoki brand).
    Prezentatsiya (deck.css) va o'yinlar to'plami (pack.css) o'z uslublariga ega, lekin shu o'zgaruvchilardan foydalanadi. */
 :root {
-  --paper: #FAF6EC; --card: #FFFFFF; --soft: #F2ECDD; --line: #E3DAC6; --grid: #EBE3D1;
-  --ink: #1E2B3C; --muted: #5F6672;
-  --brand: #1F6B5F; --brand-ink: #FFFFFF; --brand-soft: #E0EEEA; --brand-dark: #154C44;
-  --sun: #F2B632; --coral: #D9533A;
-  --math: #2E63C4; --lang: #D07021; --nature: #3A8F47;
-  --ok: #2E8B4A; --okbg: #E4F3E6; --bad: #C8432F; --badbg: #FBE6E1;
-  --team1: #2E63C4; --team2: #C8432F; --star: #F2B632;
-  --shadow-sm: 0 1px 0 rgb(30 43 60 / .06), 0 1px 3px rgb(30 43 60 / .06);
-  --shadow: 0 2px 0 rgb(30 43 60 / .05), 0 6px 18px rgb(30 43 60 / .08);
-  --shadow-lg: 0 3px 0 rgb(30 43 60 / .06), 0 14px 30px rgb(30 43 60 / .12);
+  /* "Ko'k daftar": oq varaq, to'q ko'k siyoh, qizil ruchka, sariq marker */
+  --paper: #FBFCFE; --card: #FFFFFF; --soft: #F1F5F9; --line: #E2E8F0; --grid: #E9EFF8;
+  --ink: #1E293B; --muted: #475569;
+  --brand: #1E3A8A; --brand-ink: #FFFFFF; --brand-soft: #DBEAFE; --brand-dark: #172E6E;
+  --sun: #FBBF24; --coral: #DC2626;
+  --math: #1D4ED8; --lang: #EA580C; --nature: #16A34A;
+  --ok: #16A34A; --okbg: #DCFCE7; --bad: #DC2626; --badbg: #FEE2E2;
+  --team1: #1D4ED8; --team2: #DC2626; --star: #F59E0B;
+  --shadow-sm: 0 1px 0 rgb(30 41 59 / .05), 0 1px 3px rgb(30 41 59 / .06);
+  --shadow: 0 2px 0 rgb(30 41 59 / .04), 0 6px 18px rgb(30 41 59 / .08);
+  --shadow-lg: 0 3px 0 rgb(30 41 59 / .05), 0 14px 30px rgb(30 41 59 / .12);
   --r: 16px; --r-sm: 12px;
   --display: "Baloo 2", "Nunito", system-ui, sans-serif;
   --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -19,15 +20,15 @@
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  /* Qorong'i rejim: maktab doskasi */
+  /* Qorong'i rejim: tungi ko'k daftar */
   :root {
-    --paper: #16211F; --card: #1E2C29; --soft: #263733; --line: #34483F; --grid: #1B2825;
-    --ink: #EEF2EA; --muted: #A9B8B0;
-    --brand: #6CC3B2; --brand-ink: #10201C; --brand-soft: #24413A; --brand-dark: #4FA897;
-    --sun: #F5C451; --coral: #F08A72;
-    --math: #7FA6F2; --lang: #F0A060; --nature: #79C987;
-    --ok: #79C987; --okbg: #1D3B2A; --bad: #F08A72; --badbg: #45282A;
-    --team1: #7FA6F2; --team2: #F08A72; --star: #F5C451;
+    --paper: #0F172A; --card: #1E293B; --soft: #273449; --line: #334155; --grid: #131D33;
+    --ink: #F1F5F9; --muted: #94A3B8;
+    --brand: #93C5FD; --brand-ink: #0F172A; --brand-soft: #1E3A5F; --brand-dark: #60A5FA;
+    --sun: #FBBF24; --coral: #F87171;
+    --math: #93C5FD; --lang: #FDBA74; --nature: #86EFAC;
+    --ok: #86EFAC; --okbg: #14532D; --bad: #FCA5A5; --badbg: #4C1D1D;
+    --team1: #93C5FD; --team2: #FCA5A5; --star: #FBBF24;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / .3);
     --shadow: 0 8px 22px rgb(0 0 0 / .3);
     --shadow-lg: 0 14px 34px rgb(0 0 0 / .4);
@@ -66,7 +67,7 @@ h1, h2, h3 { font-family: var(--display); line-height: 1.12; }
   background: var(--c); color: #fff; border: 0; padding: 13px 24px; font-family: var(--display); font-size: 1.15rem; line-height: 1.2;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--c) 70%, #000);
 }
-@media (prefers-color-scheme: dark) { .primary { color: #10201C; } }
+@media (prefers-color-scheme: dark) { .primary { color: #0F172A; } }
 .primary:hover:not(:disabled) { filter: brightness(1.07); }
 .primary:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 color-mix(in srgb, var(--c) 70%, #000); }
 .primary:disabled { opacity: .55; cursor: default; box-shadow: none; }
@@ -128,7 +129,7 @@ h1, h2, h3 { font-family: var(--display); line-height: 1.12; }
 .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; padding: 28px 0 40px; }
 .badge-line { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-weight: 800; font-size: .92rem; }
 .hero h1 { font-size: clamp(2.4rem, 5.4vw, 4rem); font-weight: 800; margin: 16px 0 14px; letter-spacing: -.02em; }
-.hero h1 em { font-style: normal; color: var(--brand); background: linear-gradient(transparent 62%, color-mix(in srgb, var(--sun) 70%, transparent) 62%, color-mix(in srgb, var(--sun) 70%, transparent) 92%, transparent 92%); padding: 0 .08em; }
+.hero h1 em { font-style: normal; color: var(--coral); background: linear-gradient(transparent 62%, color-mix(in srgb, var(--sun) 70%, transparent) 62%, color-mix(in srgb, var(--sun) 70%, transparent) 92%, transparent 92%); padding: 0 .08em; }
 .hero p.lead { font-size: 1.2rem; color: var(--muted); font-weight: 600; margin: 0 0 26px; max-width: 34em; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .hero-note { margin-top: 14px; color: var(--muted); font-weight: 700; font-size: .95rem; }
