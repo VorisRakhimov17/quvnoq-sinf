@@ -58,7 +58,7 @@ export class TelegramService implements OnApplicationBootstrap, OnApplicationShu
       return;
     }
     this.running = true;
-    void this.loop();
+    void this.loop().catch((e) => this.log.error(`Polling to‘xtadi: ${(e as Error).message}`));
   }
 
   onApplicationShutdown() {
@@ -89,6 +89,8 @@ export class TelegramService implements OnApplicationBootstrap, OnApplicationShu
         );
         for (const u of updates) {
           offset = u.update_id + 1;
+          const kind = u.message ? (u.message.text ? `matn "${u.message.text.slice(0, 30)}"` : 'fayl/rasm') : 'tugma';
+          this.log.log(`Keldi: ${kind} (chat ${u.message?.chat.id ?? u.callback_query?.from.id})`);
           try {
             if (u.message) await this.onMessage(u.message);
             if (u.callback_query) await this.onCallback(u.callback_query);

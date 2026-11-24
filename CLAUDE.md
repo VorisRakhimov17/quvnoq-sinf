@@ -9,6 +9,7 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 - `prototype/quvnoq-sinf.html` — birinchi bitta faylli versiya (faqat ma'lumot uchun).
 
 ## Qoidalar
+- Foydalanuvchiga hamma narsa faqat o'zbek tilida yoziladi (xabarlar, xulosa oynasi, tugmalar, savollar) — inglizcha emas.
 - UI matnlari o'zbek lotin yozuvida; o‘ va g‘ uchun `‘` (U+2018) belgisi ishlatiladi.
 - O'yin mantig'i `frontend/src/games/` da: har bir o'yin `gen(grade)` funksiyasi savol qaytaradi.
 - Sirlar faqat `backend/.env` da (gitga tushmaydi). Namuna: `backend/.env.example`.
