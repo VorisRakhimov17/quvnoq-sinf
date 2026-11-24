@@ -79,7 +79,7 @@ export default function AdminPage() {
             <li key={o.id}>
               <span className="qemoji">{o.status === 'submitted' ? '🧾' : '⏳'}</span>
               <div>
-                <strong>#{o.code} · {o.credits} ta o‘yin · {formatSum(o.price)}</strong>
+                <strong>#{o.code} · {o.credits} kredit · {formatSum(o.price)}</strong>
                 <small>{o.teacher.name} · {o.teacher.email} · {o.status === 'submitted' ? 'chek Telegram’da' : 'chek hali yuborilmagan'} · {new Date(o.createdAt).toLocaleString('uz-UZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</small>
               </div>
               <div className="btn-row">

@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 
 export default function Login() {
   const { teacher, signIn } = useAuth();
   const nav = useNavigate();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [params] = useSearchParams();
+  const [mode, setMode] = useState<'login' | 'register'>(params.get('r') ? 'register' : 'login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,19 +32,31 @@ export default function Login() {
   }
 
   return (
-    <div className="panel narrow">
-      <div className="chips tabs">
-        <button className="chip" aria-pressed={mode === 'login'} onClick={() => setMode('login')}>Kirish</button>
-        <button className="chip" aria-pressed={mode === 'register'} onClick={() => setMode('register')}>Ro‘yxatdan o‘tish</button>
+    <div className="auth">
+      <div className="auth-side">
+        <h1>{mode === 'login' ? 'Xush kelibsiz!' : 'Quvnoq Sinfga qo‘shiling'}</h1>
+        <ul>
+          <li><span>🎬</span>Mavzu bo‘yicha dars prezentatsiyasi bir daqiqada</li>
+          <li><span>🎮</span>Har bir mavzuga 5 xil o‘yin: viktorina, juftini top va boshqalar</li>
+          <li><span>👥</span>Proyektorda ikki jamoa bo‘lib bellashuv</li>
+          <li><span>📊</span>Natijalar kabinetingizda saqlanadi</li>
+        </ul>
+        <div className="gift">🎁 Ro‘yxatdan o‘tganingizda 5 ta bepul kredit</div>
       </div>
-      <form className="form" onSubmit={submit}>
+
+      <form className="form auth-form" onSubmit={submit}>
+        <div className="seg" role="tablist">
+          <button type="button" role="tab" aria-pressed={mode === 'login'} onClick={() => setMode('login')}>Kirish</button>
+          <button type="button" role="tab" aria-pressed={mode === 'register'} onClick={() => setMode('register')}>Ro‘yxatdan o‘tish</button>
+        </div>
+        <h2>{mode === 'login' ? 'Hisobingizga kiring' : 'Yangi hisob yaratish'}</h2>
         {mode === 'register' && (
           <label>Ism-familiya
-            <input id="name" value={name} onChange={(e) => setName(e.target.value)} required minLength={2} autoComplete="name" />
+            <input id="name" value={name} onChange={(e) => setName(e.target.value)} required minLength={2} autoComplete="name" placeholder="Masalan: Dilnoza Karimova" />
           </label>
         )}
         <label>Email
-          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" placeholder="email@misol.uz" />
         </label>
         <label>Parol
           <input
@@ -53,9 +66,15 @@ export default function Login() {
           {mode === 'register' && <small>Kamida 8 belgi</small>}
         </label>
         {error && <p className="error">{error}</p>}
-        <button className="primary" disabled={busy}>
-          {busy ? 'Kuting…' : mode === 'login' ? 'Kirish' : 'Akkaunt yaratish'}
+        <button className="primary big" disabled={busy}>
+          {busy ? 'Kuting…' : mode === 'login' ? 'Kirish' : 'Hisob yaratish va 5 kredit olish'}
         </button>
+        <p className="muted">
+          {mode === 'login' ? 'Hisobingiz yo‘qmi? ' : 'Hisobingiz bormi? '}
+          <button type="button" className="linkish" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
+            {mode === 'login' ? 'Ro‘yxatdan o‘ting' : 'Kiring'}
+          </button>
+        </p>
       </form>
     </div>
   );

@@ -82,7 +82,7 @@ export default function Presentations({ onBuy }: { onBuy?: () => void }) {
   return (
     <div className="decks">
       <form className="form topic-form" onSubmit={generate} style={{ '--c': SUBJECTS[subject].color } as CSSProperties}>
-        <h3>Mavzu bo‘yicha dars prezentatsiyasi</h3>
+        <h3>✨ Yangi prezentatsiya</h3>
         <p className="muted">
           Mavzuni yozing — sun’iy intellekt rasmlar, misollar, savollar va faollik bilan to‘liq dars tayyorlaydi.
           Har bir prezentatsiya o‘z syujeti va dizayniga ega bo‘ladi.

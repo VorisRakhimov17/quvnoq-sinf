@@ -78,9 +78,9 @@ export function BuyBox({ onChange }: { onChange?: () => void }) {
             className={'package' + (p.best ? ' best' : '') + (sel === p.credits ? ' selected' : '')}
             onClick={() => { setSel(p.credits); setOrder(null); }}>
             {p.best && <span className="badge">Qulay</span>}
-            <strong>{p.credits} ta o‘yin</strong>
+            <strong>{p.credits} kredit</strong>
             <span className="price">{formatSum(p.price)}</span>
-            <small>1 o‘yin ≈ {formatSum(Math.round(p.price / p.credits))}</small>
+            <small>1 kredit ≈ {formatSum(Math.round(p.price / p.credits))}</small>
           </button>
         ))}
       </div>
@@ -89,7 +89,7 @@ export function BuyBox({ onChange }: { onChange?: () => void }) {
         <p className="notice muted">Onlayn to‘lov hali sozlanmagan. Tez orada ishga tushadi.</p>
       ) : !order ? (
         <button className="primary buy-btn" disabled={busy || sel === null} onClick={buy}>
-          {busy ? 'Kuting…' : `Sotib olish: ${sel} ta o‘yin`}
+          {busy ? 'Kuting…' : `Sotib olish: ${sel} kredit`}
         </button>
       ) : (
         <div className="pay-steps">
@@ -130,7 +130,7 @@ export function BuyBox({ onChange }: { onChange?: () => void }) {
           <ul>
             {mine.slice(0, 5).map((p) => (
               <li key={p.id}>
-                <span>#{p.code} · {p.credits} ta o‘yin · {formatSum(p.price)}</span>
+                <span>#{p.code} · {p.credits} kredit · {formatSum(p.price)}</span>
                 <span className={'status ' + p.status}>{STATUS[p.status]}</span>
               </li>
             ))}
@@ -161,7 +161,7 @@ export default function Credits() {
         <span className="big">💎 {data.credits}</span>
         <div>
           <strong>kredit qoldi</strong>
-          <p className="muted">1 kredit = mavzu bo‘yicha 1 ta AI o‘yin (5, 10 yoki 15 savol). Tayyor o‘yinlarni qayta o‘ynash bepul.</p>
+          <p className="muted">🎮 O‘yinlar to‘plami — 1 kredit · 🎬 prezentatsiya — 3 kredit. Tayyor o‘yinlar va saqlanganlarini qayta ochish bepul.</p>
         </div>
       </div>
 

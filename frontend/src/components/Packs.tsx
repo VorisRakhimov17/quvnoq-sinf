@@ -63,7 +63,7 @@ export default function Packs({ onBuy }: { onBuy?: () => void }) {
   return (
     <div className="decks">
       <form className="form topic-form" onSubmit={generate} style={{ '--c': SUBJECTS[subject].color } as CSSProperties}>
-        <h3>Mavzu bo‘yicha o‘yinlar to‘plami</h3>
+        <h3>✨ Yangi o‘yinlar to‘plami</h3>
         <p className="muted">Mavzuni yozing — sun’iy intellekt shu mavzuda 5 xil o‘yin tayyorlaydi. Sinf bilan yoki ikki jamoa bo‘lib o‘ynaysiz.</p>
         <div className="pk-chips">{GAMES_LIST.map((g) => <span key={g}>{g}</span>)}</div>
         <div className="row">

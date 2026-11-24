@@ -6,37 +6,142 @@ import Credits from '../components/Credits';
 import Presentations from '../components/Presentations';
 import Packs from '../components/Packs';
 import { topicLink } from '../components/TopicGame';
+import type { PresentationRow } from '../deck/types';
 import { SUBJECTS, gameTitle } from '../games';
 import type { SubjectId } from '../games/types';
+import { SECTIONS, type SectionId } from '../nav';
+import type { GamePackRow } from '../pack/types';
+
+const PAGE_INFO: Record<SectionId, { title: string; sub: string }> = {
+  panel: { title: '', sub: '' },
+  oyin: { title: '🎮 Mavzu bo‘yicha o‘yinlar', sub: 'Mavzuni yozing — 5 xil o‘yin tayyor bo‘ladi' },
+  prezentatsiya: { title: '🎬 Prezentatsiyalar', sub: 'Mavzu bo‘yicha to‘liq dars slaydlari' },
+  results: { title: '📊 Natijalar', sub: 'Sinfda o‘ynalgan o‘yinlar natijalari' },
+  questions: { title: '✏️ Mening savollarim', sub: 'O‘zingiz qo‘shgan va saqlagan savollar' },
+  kredit: { title: '💎 Kreditlar', sub: 'Balans, sotib olish va tarix' },
+};
 
 export default function TeacherPage() {
   const { teacher, loading, signOut } = useAuth();
   const [params, setParams] = useSearchParams();
   const raw = params.get('tab') === 'topic' ? 'oyin' : params.get('tab');
-  const tab = (['oyin', 'prezentatsiya', 'results', 'questions', 'kredit'] as const).find((t) => t === raw) ?? 'oyin';
-  const setTab = (t: typeof tab) => setParams(t === 'oyin' ? {} : { tab: t }, { replace: true });
+  const tab: SectionId = SECTIONS.find((t) => t.id === raw)?.id ?? 'panel';
+  const setTab = (t: SectionId) => { setParams(t === 'panel' ? {} : { tab: t }); window.scrollTo({ top: 0 }); };
 
   if (loading) return <p className="empty">Yuklanmoqda…</p>;
   if (!teacher) return <Navigate to="/kirish" replace />;
+  const buy = () => setTab('kredit');
 
   return (
-    <div className="panel">
-      <div className="panel-head">
-        <div>
-          <h2>Assalomu alaykum, {teacher.name}!</h2>
-          <p className="muted">{teacher.email}</p>
+    <div className="dash">
+      <aside className="side" aria-label="Kabinet bo‘limlari">
+        <div className="side-user">
+          <span className="avatar">{teacher.name.trim()[0]?.toUpperCase()}</span>
+          <div><b>{teacher.name}</b><small>{teacher.email}</small></div>
         </div>
-        <button className="ghost" onClick={signOut}>Chiqish</button>
-      </div>
-      <div className="chips tabs">
-        <button className="chip" aria-pressed={tab === 'oyin'} onClick={() => setTab('oyin')}>🎮 Mavzu bo‘yicha o‘yinlar</button>
-        <button className="chip" aria-pressed={tab === 'prezentatsiya'} onClick={() => setTab('prezentatsiya')}>🎬 Prezentatsiya</button>
-        <button className="chip" aria-pressed={tab === 'results'} onClick={() => setTab('results')}>Natijalar</button>
-        <button className="chip" aria-pressed={tab === 'questions'} onClick={() => setTab('questions')}>Mening savollarim</button>
-        <button className="chip" aria-pressed={tab === 'kredit'} onClick={() => setTab('kredit')}>💎 Kreditlar: {teacher.credits}</button>
-      </div>
-      {tab === 'prezentatsiya' ? <Presentations onBuy={() => setTab('kredit')} /> : tab === 'oyin' ? <Packs onBuy={() => setTab('kredit')} /> : tab === 'results' ? <Results /> : tab === 'kredit' ? <Credits /> : <Questions />}
+        {SECTIONS.map((s) => (
+          <button key={s.id} aria-current={tab === s.id ? 'page' : undefined} onClick={() => setTab(s.id)}>
+            <span className="si">{s.icon}</span>{s.label}
+            {s.id === 'kredit' && <span className="count">{teacher.credits}</span>}
+          </button>
+        ))}
+        <hr />
+        {teacher.isAdmin && <Link to="/admin"><span className="si">⚙️</span>Admin</Link>}
+        <button onClick={signOut}><span className="si">🚪</span>Chiqish</button>
+      </aside>
+
+      <main className="dash-main">
+        {tab === 'panel' ? <Overview onGo={setTab} /> : (
+          <>
+            <div className="page-title">
+              <div><h1>{PAGE_INFO[tab].title}</h1><p>{PAGE_INFO[tab].sub}</p></div>
+            </div>
+            {tab === 'prezentatsiya' ? <Presentations onBuy={buy} />
+              : tab === 'oyin' ? <Packs onBuy={buy} />
+                : tab === 'results' ? <Results />
+                  : tab === 'kredit' ? <div className="box"><Credits /></div>
+                    : <div className="box"><Questions /></div>}
+          </>
+        )}
+      </main>
     </div>
+  );
+}
+
+/** Bosh panel: salomlashish, balans, asosiy harakatlar va oxirgi ishlar */
+function Overview({ onGo }: { onGo: (t: SectionId) => void }) {
+  const { teacher } = useAuth();
+  const [packs, setPacks] = useState<GamePackRow[] | null>(null);
+  const [decks, setDecks] = useState<PresentationRow[] | null>(null);
+  useEffect(() => {
+    api.packs().then(setPacks, () => setPacks([]));
+    api.decks().then(setDecks, () => setDecks([]));
+  }, []);
+  const hour = new Date().getHours();
+  const hello = hour < 12 ? 'Xayrli tong' : hour < 18 ? 'Xayrli kun' : 'Xayrli kech';
+
+  return (
+    <>
+      <div className="box welcome">
+        <div>
+          <h1>{hello}, {teacher!.name.split(' ')[0]}! 👋</h1>
+          <p>Bugun qaysi mavzuni o‘tamiz? Mavzuni yozing — qolganini biz tayyorlaymiz.</p>
+        </div>
+        <div className="wallet">
+          <div><b>💎 {teacher!.credits}</b><small>kredit</small></div>
+          <button onClick={() => onGo('kredit')}>+ Kredit olish</button>
+        </div>
+      </div>
+
+      <div className="actions-grid">
+        <button className="action-card" style={{ '--ac': 'var(--coral)' } as CSSProperties} onClick={() => onGo('oyin')}>
+          <span className="ai">🎮</span><b>O‘yin yaratish</b>
+          <p>Bir mavzudan 5 xil o‘yin: viktorina, juftini top, guruhlash va boshqalar. 1 kredit.</p>
+          <span className="go">Boshlash →</span>
+        </button>
+        <button className="action-card" style={{ '--ac': 'var(--brand)' } as CSSProperties} onClick={() => onGo('prezentatsiya')}>
+          <span className="ai">🎬</span><b>Prezentatsiya yaratish</b>
+          <p>Rasmlar, misollar va savollar bilan to‘liq dars slaydlari. 3 kredit.</p>
+          <span className="go">Boshlash →</span>
+        </button>
+        <Link className="action-card" style={{ '--ac': 'var(--nature)' } as CSSProperties} to="/#tayyor">
+          <span className="ai">🧩</span><b>Tayyor o‘yinlar</b>
+          <p>Matematika, ona tili va tabiatshunoslikdan bepul o‘yinlar.</p>
+          <span className="go">Ochish →</span>
+        </Link>
+      </div>
+
+      <div className="box">
+        <div className="recent-head"><h3>🎮 Oxirgi o‘yinlarim</h3>{!!packs?.length && <button className="linkish" onClick={() => onGo('oyin')}>Hammasi →</button>}</div>
+        {!packs ? <p className="muted">Yuklanmoqda…</p> : packs.length === 0 ? <p className="empty">Hali o‘yin yaratilmagan.</p> : (
+          <div className="deck-cards">
+            {packs.slice(0, 3).map((p) => (
+              <Link key={p.id} to={`/toplam/${p.id}`} className="deck-card" style={{ '--d1': SUBJECTS[p.subject].color, textDecoration: 'none' } as CSSProperties}>
+                <span className="deck-cover pack-cover"><span className="deck-emoji">{p.emoji}</span></span>
+                <span className="deck-body"><strong>{p.title}</strong><small>{SUBJECTS[p.subject].name} · {p.grade}-sinf</small></span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="box">
+        <div className="recent-head"><h3>🎬 Oxirgi prezentatsiyalarim</h3>{!!decks?.length && <button className="linkish" onClick={() => onGo('prezentatsiya')}>Hammasi →</button>}</div>
+        {!decks ? <p className="muted">Yuklanmoqda…</p> : decks.length === 0 ? <p className="empty">Hali prezentatsiya yaratilmagan.</p> : (
+          <div className="deck-cards">
+            {decks.slice(0, 3).map((p) => (
+              <Link key={p.id} to={`/prezentatsiya/${p.id}`} className="deck-card" style={{
+                ...(p.palette ? { '--d1': p.palette.primary, '--d2': p.palette.secondary, '--d3': p.palette.accent, '--dbg': p.palette.bg } : {}),
+                textDecoration: 'none',
+              } as CSSProperties}>
+                <span className="deck-cover"><span className="deck-emoji">{p.emoji}</span><span className="deck-strip"><i /><i /><i /></span></span>
+                <span className="deck-body"><strong>{p.title}</strong><small>{SUBJECTS[p.subject].name} · {p.grade}-sinf · {p.slides} slayd</small></span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

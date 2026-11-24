@@ -12,7 +12,7 @@ export const PACKAGES = [
 ];
 
 const fmt = (n: number) => n.toLocaleString('ru-RU').replace(/\s|,/g, ' ') + ' so‘m';
-export const describe = (p: { credits: number; price: number }) => `${p.credits} ta o‘yin — ${fmt(p.price)}`;
+export const describe = (p: { credits: number; price: number }) => `${p.credits} kredit — ${fmt(p.price)}`;
 
 @Injectable()
 export class PurchasesService {
