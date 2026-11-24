@@ -7,6 +7,10 @@ import { loadDeckFonts, themeVars } from '../deck/theme';
 import type { Presentation } from '../deck/types';
 import '../deck/deck.css';
 
+/** Prezentatsiya mavzusi bo'yicha o'yinlar yaratish formasi (maydonlar oldindan to'ldiriladi) */
+export const gamesLink = (p: { subject: string; grade: number; topic: string }) =>
+  `/kabinet?tab=oyin&fan=${p.subject}&sinf=${p.grade}&mavzu=${encodeURIComponent(p.topic)}`;
+
 /** Sahna 1600×900 o'lchamda chiziladi va oynaga moslab kattalashtiriladi */
 function useFit(ref: React.RefObject<HTMLDivElement | null>, ready: boolean) {
   const [scale, setScale] = useState(1);
@@ -132,6 +136,10 @@ export default function PresentPage() {
         <div className="notes-panel">
           <b>O‘qituvchi uchun:</b> {slide.notes || '—'}
         </div>
+      )}
+
+      {i === slides.length - 1 && (
+        <Link className="to-games" to={gamesLink(p)}>🎮 Shu mavzuda o‘yinlar</Link>
       )}
 
       <div className="controls">

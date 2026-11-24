@@ -40,11 +40,16 @@ prototype/            birinchi bitta faylli versiya
    ```
 4. Brauzerda oching: http://localhost:5173
 
-## Mavzu bo‘yicha AI o‘yin
+## Mavzu bo‘yicha o‘yinlar to‘plami
 
-Kabinetdagi “✨ Mavzu bo‘yicha o‘yin” bo‘limi Claude API (`claude-opus-5-5`) yordamida savollar tayyorlaydi.
-Yoqish uchun `backend/.env` ga `ANTHROPIC_API_KEY=...` yozing (kalit: https://console.anthropic.com → API Keys) va backendni qayta ishga tushiring.
-Kalit bo‘lmasa, bu bo‘lim o‘chiq turadi, qolgan qismlar ishlayveradi. Har bir o‘qituvchiga kuniga 30 ta yaratish limiti bor (`backend/src/ai/ai.module.ts`).
+Kabinetdagi “🎮 Mavzu bo‘yicha o‘yinlar” bo‘limi mavzuni yozganda 5 xil o‘yin tayyorlaydi (1 kredit, ~30 soniya):
+🧠 viktorina, ⚖️ to‘g‘ri yoki noto‘g‘ri, 🔗 juftini top, 🧺 guruhlarga ajrat, 🪜 tartibga sol.
+- O‘ynash: `/toplam/:id`. Viktorina, to‘g‘ri/noto‘g‘ri va guruhlash ikki jamoa bo‘lib ham o‘ynaladi.
+  Klavishlar: 1–4 / ← → — javob, Enter — keyingisi. Natijalar “Natijalar” bo‘limiga `pack-<tur>` nomi bilan saqlanadi.
+- O‘lchov: 2 100 kirish / 2 200 chiqish token ≈ $0.05. Kod: `backend/src/packs/`, `frontend/src/pack/`.
+- Prezentatsiyaning oxirgi slaydida va ro‘yxatida “🎮 O‘yin” tugmasi shu mavzu bilan formani to‘ldirib ochadi.
+- Eski usul (savollarni tahrirlab “Mening savollarim”ga saqlash) shu bo‘lim pastida qoldi.
+  Kalit: `backend/.env` dagi `ANTHROPIC_API_KEY`. Har bir o‘qituvchiga kuniga 30 ta yaratish limiti bor.
 
 ## Dars prezentatsiyasi
 
@@ -105,3 +110,5 @@ Barcha yo‘llar `/api` ostida. Belgilanganlari uchun `Authorization: Bearer <to
 | POST | `/api/presentations/generate` | 🔒 prezentatsiya yaratish va saqlash (3 kredit) |
 | GET | `/api/presentations`, `/api/presentations/:id` | 🔒 mening prezentatsiyalarim / bittasi |
 | DELETE | `/api/presentations/:id` | 🔒 o‘chirish |
+| POST | `/api/packs/generate` | 🔒 5 xil o‘yinli to‘plam yaratish va saqlash (1 kredit) |
+| GET/DELETE | `/api/packs`, `/api/packs/:id` | 🔒 mening to‘plamlarim / bittasi / o‘chirish |

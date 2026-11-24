@@ -36,4 +36,9 @@ export const GAMES: GameDef[] = [
   })),
 ];
 
-export const gameTitle = (id: string) => GAMES.find((g) => g.id === id)?.title ?? id;
+/** To'plam o'yinlari natijalari "pack-<tur>" nomi bilan saqlanadi */
+const PACK_TITLES: Record<string, string> = {
+  'pack-quiz': 'Mavzu: viktorina', 'pack-truefalse': 'Mavzu: to‘g‘ri yoki noto‘g‘ri',
+  'pack-pairs': 'Mavzu: juftini top', 'pack-sort': 'Mavzu: guruhlarga ajrat', 'pack-order': 'Mavzu: tartibga sol',
+};
+export const gameTitle = (id: string) => GAMES.find((g) => g.id === id)?.title ?? PACK_TITLES[id] ?? id;

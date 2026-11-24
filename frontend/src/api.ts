@@ -1,5 +1,6 @@
 import type { Presentation, PresentationRow } from './deck/types';
 import type { SubjectId } from './games/types';
+import type { GamePack, GamePackRow } from './pack/types';
 
 const TOKEN_KEY = 'qs_token';
 
@@ -90,6 +91,12 @@ export const api = {
   deleteDeck: (id: number) => request<{ deleted: boolean }>(`/presentations/${id}`, 'DELETE'),
   generateDeck: (p: { subject: SubjectId; grade: number; topic: string; size: 'short' | 'normal' | 'long'; wishes?: string }) =>
     request<{ id: number; credits: number }>('/presentations/generate', 'POST', p),
+
+  packs: () => request<GamePackRow[]>('/packs'),
+  pack: (id: number) => request<GamePack>(`/packs/${id}`),
+  deletePack: (id: number) => request<{ deleted: boolean }>(`/packs/${id}`, 'DELETE'),
+  generatePack: (p: { subject: SubjectId; grade: number; topic: string }) =>
+    request<{ id: number; credits: number }>('/packs/generate', 'POST', p),
 
   credits: () => request<{ credits: number; history: CreditTx[] }>('/credits'),
   purchaseConfig: () => request<PurchaseConfig>('/purchases/config'),

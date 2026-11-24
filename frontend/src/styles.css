@@ -265,3 +265,11 @@ button.package { text-align: left; font: inherit; color: inherit; background: tr
 .deck-body strong { font-family: var(--display); font-size: 1.15rem; line-height: 1.2; }
 .deck-body small { font-weight: 600; color: var(--muted); }
 .deck-body .btn-row { margin-top: auto; padding-top: 10px; }
+
+/* Mavzu chiplari (kabinet formasi) */
+.pk-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pk-chips span { padding: 4px 12px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); font-weight: 700; font-size: .9rem; }
+.old-way { margin-top: 28px; border-top: 1px dashed var(--line); padding-top: 14px; }
+.old-way summary { cursor: pointer; font-weight: 800; color: var(--muted); }
+.old-way[open] summary { margin-bottom: 14px; }
+.pack-cover { background: radial-gradient(90% 120% at 80% 20%, color-mix(in srgb, var(--d1) 35%, var(--card)) 0%, var(--card) 75%); }

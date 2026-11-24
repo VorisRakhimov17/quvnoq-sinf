@@ -18,6 +18,10 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 ## AI (mavzu bo'yicha o'yin)
 - `backend/src/ai/ai.module.ts`: `@anthropic-ai/sdk`, `beta.messages.parse` + zod sxema, `fallbacks: 'default'`. Kalit `ANTHROPIC_API_KEY` (.env). Savollar `topic` maydoni bilan saqlanadi; o'yin: `/oyin/mening-<fan>?mavzu=<mavzu>`.
 
+## O'yinlar to'plami
+- `backend/src/packs/packs.module.ts` (GamePack, data JSON) ↔ `frontend/src/pack/types.ts`. 5 o'yin: quiz, truefalse, pairs, sort, order. Narx `GAME_COST` (1). `clean()` yaroqsiz elementni tashlaydi; bo'sh o'yin menyuda ko'rinmaydi.
+- CSS: `deck.css` va `pack.css` dagi har bir selektor `.present` / `.pk` bilan boshlanadi (`python scripts/scope-css.py <fayl> <klass>`), chunki Vite hamma CSS'ni global yuklaydi.
+
 ## Prezentatsiyalar
 - `backend/src/presentations/presentations.module.ts`: AI tekis (flat) slayd sxemasini qaytaradi (union sxema "compiled grammar is too large" xatosini berdi), `toSlide()` aniq turlarga o'giradi. Frontend turlari: `frontend/src/deck/types.ts` — ikkalasi mos bo'lishi shart.
 - Takrorlanmaslik: `FRAMES` (syujet) va `MOODS` (rang) tasodifiy, oxirgi 8 ta `style` dan qochiladi. Slayd ko'rinishi varianti `hash(title+index)` dan.

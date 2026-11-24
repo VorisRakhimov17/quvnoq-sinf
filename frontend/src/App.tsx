@@ -4,6 +4,7 @@ import GamePage from './pages/GamePage';
 import Home from './pages/Home';
 import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
+import PackPage from './pages/PackPage';
 import PresentPage from './pages/PresentPage';
 import TeacherPage from './pages/TeacherPage';
 import { useSettings } from './settings';
@@ -42,7 +43,7 @@ function Header() {
 export default function App() {
   const settings = useSettings();
   const path = useLocation().pathname;
-  const inGame = path.startsWith('/oyin/') || path.startsWith('/prezentatsiya/');
+  const inGame = path.startsWith('/oyin/') || path.startsWith('/prezentatsiya/') || path.startsWith('/toplam/');
   return (
     <div className="wrap">
       {!inGame && <Header />}
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="/kirish" element={<Login />} />
         <Route path="/kabinet" element={<TeacherPage />} />
         <Route path="/prezentatsiya/:id" element={<PresentPage />} />
+        <Route path="/toplam/:id" element={<PackPage settings={settings} />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<p className="empty">Sahifa topilmadi. <Link to="/">Bosh sahifaga qaytish</Link></p>} />
       </Routes>

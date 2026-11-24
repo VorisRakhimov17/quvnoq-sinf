@@ -24,6 +24,7 @@ model Teacher {
   creditTxs    CreditTx[]
   purchases    Purchase[]
   presentations Presentation[]
+  gamePacks     GamePack[]
 }
 
 enum PurchaseStatus {
@@ -128,6 +129,22 @@ model Presentation {
   style     String
   /// { theme, mascot, slides[] }
   deck      Json
+  createdAt DateTime @default(now())
+
+  @@index([teacherId, createdAt])
+}
+
+/// Mavzu bo'yicha AI tayyorlagan o'yinlar to'plami: savol, to'g'ri/noto'g'ri, juftlik, guruhlash, tartib
+model GamePack {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subject   Subject
+  grade     Int
+  topic     String
+  title     String
+  /// { emoji, quiz[], truefalse[], pairs, sort, order[] }
+  data      Json
   createdAt DateTime @default(now())
 
   @@index([teacherId, createdAt])

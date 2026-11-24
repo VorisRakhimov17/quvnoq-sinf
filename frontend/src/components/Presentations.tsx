@@ -4,6 +4,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import type { PresentationRow } from '../deck/types';
 import { SUBJECTS } from '../games';
+import { gamesLink } from '../pages/PresentPage';
 import type { SubjectId } from '../games/types';
 
 const EXAMPLES: Record<SubjectId, string> = {
@@ -150,6 +151,7 @@ export default function Presentations({ onBuy }: { onBuy?: () => void }) {
                 <small className="muted">{p.style.split(' | ')[2] ?? ''} · {new Date(p.createdAt).toLocaleDateString('uz-UZ')}</small>
                 <div className="btn-row">
                   <Link className="primary small" to={`/prezentatsiya/${p.id}`}>▶ Ko‘rsatish</Link>
+                  <Link className="ghost small" to={gamesLink(p)} title="Shu mavzuda o‘yinlar yaratish">🎮 O‘yin</Link>
                   <button className="ghost small" onClick={() => remove(p)}>O‘chirish</button>
                 </div>
               </div>

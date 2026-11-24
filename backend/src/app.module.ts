@@ -4,6 +4,7 @@ import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { CreditsModule } from './credits/credits.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { PacksModule } from './packs/packs.module';
 import { PresentationsModule } from './presentations/presentations.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { PrismaService } from './prisma/prisma.service';
@@ -32,6 +33,7 @@ class HealthController {
     AiModule,
     PurchasesModule,
     PresentationsModule,
+    PacksModule,
   ],
   controllers: [HealthController],
 })
