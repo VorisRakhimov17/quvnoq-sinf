@@ -25,6 +25,7 @@ model Teacher {
   purchases    Purchase[]
   presentations Presentation[]
   gamePacks     GamePack[]
+  adventures    Adventure[]
 }
 
 enum PurchaseStatus {
@@ -148,4 +149,41 @@ model GamePack {
   createdAt DateTime @default(now())
 
   @@index([teacherId, createdAt])
+}
+
+/// Missiyali sarguzasht o'yini: o'qituvchi hafta/oy mavzularini kiritadi, AI missiyalar zanjirini tuzadi.
+/// O'quvchilar ochiq havola (code) orqali kirmasdan o'ynaydi.
+model Adventure {
+  id        Int            @id @default(autoincrement())
+  teacherId Int
+  teacher   Teacher        @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  code      String         @unique // ochiq havola kodi: /sarguzasht/<code>
+  title     String
+  grade     Int
+  topics    String[]
+  /// { intro, goal, finale, missions[] }
+  data      Json
+  createdAt DateTime       @default(now())
+  runs      AdventureRun[]
+
+  @@index([teacherId, createdAt])
+}
+
+/// Bitta o'quvchining sarguzashtdagi natijasi (reyting uchun)
+model AdventureRun {
+  id          Int       @id @default(autoincrement())
+  adventureId Int
+  adventure   Adventure @relation(fields: [adventureId], references: [id], onDelete: Cascade)
+  playerId    String    // brauzerda saqlanadigan tasodifiy id
+  name        String
+  avatar      String
+  stars       Int       @default(0)
+  coins       Int       @default(0)
+  missions    Int       @default(0) // tugatilgan missiyalar soni
+  finished    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([adventureId, playerId])
+  @@index([adventureId, stars])
 }

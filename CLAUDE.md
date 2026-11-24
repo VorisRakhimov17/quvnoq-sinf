@@ -18,6 +18,11 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 ## AI (mavzu bo'yicha o'yin)
 - `backend/src/ai/ai.module.ts`: `@anthropic-ai/sdk`, `beta.messages.parse` + zod sxema, `fallbacks: 'default'`. Kalit `ANTHROPIC_API_KEY` (.env). Savollar `topic` maydoni bilan saqlanadi; o'yin: `/oyin/mening-<fan>?mavzu=<mavzu>`.
 
+## Sarguzasht (missiyali o'yin)
+- `backend/src/adventures/adventures.module.ts`: Adventure (ochiq `code`) + AdventureRun (o'quvchi natijasi, `playerId` brauzerda). `/api/play/*` kirishsiz — o'quvchilar uchun. Narx `ADVENTURE_COST` = 3 (5 missiya ≈ 1 900 in / 6 900 out token ≈ $0.15, 2026-11-24).
+- Frontend: `world.ts` xaritani kod bo'yicha urug'li tasodif bilan quradi (har safar bir xil), zonalar orasida darvoza; `Engine.tsx` canvas: statik yer qatlami bir marta chiziladi, harakat mayda qadamlarga bo'linadi (sekin kompyuterda ham to'g'ri tezlik).
+- Zo'ravonlik yo'q: missiyalar yordam berish, topish, tuzatish haqida (SYSTEM promptda).
+
 ## O'yinlar to'plami
 - `backend/src/packs/packs.module.ts` (GamePack, data JSON) ↔ `frontend/src/pack/types.ts`. 5 o'yin: quiz, truefalse, pairs, sort, order. Narx `GAME_COST` (1). `clean()` yaroqsiz elementni tashlaydi; bo'sh o'yin menyuda ko'rinmaydi.
 - CSS: `deck.css` va `pack.css` dagi har bir selektor `.present` / `.pk` bilan boshlanadi (`python scripts/scope-css.py <fayl> <klass>`), chunki Vite hamma CSS'ni global yuklaydi.

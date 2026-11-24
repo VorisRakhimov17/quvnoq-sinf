@@ -1,5 +1,6 @@
 import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AdventuresModule } from './adventures/adventures.module';
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { CreditsModule } from './credits/credits.module';
@@ -34,6 +35,7 @@ class HealthController {
     PurchasesModule,
     PresentationsModule,
     PacksModule,
+    AdventuresModule,
   ],
   controllers: [HealthController],
 })

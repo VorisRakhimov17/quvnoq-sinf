@@ -4,6 +4,7 @@ import { api, type CustomQuestion, type GameResult } from '../api';
 import { useAuth } from '../auth';
 import Credits from '../components/Credits';
 import Presentations from '../components/Presentations';
+import Adventures from '../components/Adventures';
 import Packs from '../components/Packs';
 import { topicLink } from '../components/TopicGame';
 import type { PresentationRow } from '../deck/types';
@@ -16,6 +17,7 @@ const PAGE_INFO: Record<SectionId, { title: string; sub: string }> = {
   panel: { title: '', sub: '' },
   oyin: { title: '🎮 Mavzu bo‘yicha o‘yinlar', sub: 'Mavzuni yozing — 5 xil o‘yin tayyor bo‘ladi' },
   prezentatsiya: { title: '🎬 Prezentatsiyalar', sub: 'Mavzu bo‘yicha to‘liq dars slaydlari' },
+  sarguzasht: { title: '🗺️ Sarguzasht o‘yinlari', sub: 'Hafta yoki oy mavzularidan missiyali o‘yin — bolalar havola orqali o‘ynaydi' },
   results: { title: '📊 Natijalar', sub: 'Sinfda o‘ynalgan o‘yinlar natijalari' },
   questions: { title: '✏️ Mening savollarim', sub: 'O‘zingiz qo‘shgan va saqlagan savollar' },
   kredit: { title: '💎 Kreditlar', sub: 'Balans, sotib olish va tarix' },
@@ -58,6 +60,7 @@ export default function TeacherPage() {
             </div>
             {tab === 'prezentatsiya' ? <Presentations onBuy={buy} />
               : tab === 'oyin' ? <Packs onBuy={buy} />
+                : tab === 'sarguzasht' ? <Adventures onBuy={buy} />
                 : tab === 'results' ? <Results />
                   : tab === 'kredit' ? <div className="box"><Credits /></div>
                     : <div className="box"><Questions /></div>}
@@ -102,6 +105,11 @@ function Overview({ onGo }: { onGo: (t: SectionId) => void }) {
         <button className="action-card" style={{ '--ac': 'var(--brand)' } as CSSProperties} onClick={() => onGo('prezentatsiya')}>
           <span className="ai">🎬</span><b>Prezentatsiya yaratish</b>
           <p>Rasmlar, misollar va savollar bilan to‘liq dars slaydlari. 3 kredit.</p>
+          <span className="go">Boshlash →</span>
+        </button>
+        <button className="action-card" style={{ '--ac': 'var(--sun)' } as CSSProperties} onClick={() => onGo('sarguzasht')}>
+          <span className="ai">🗺️</span><b>Sarguzasht yaratish</b>
+          <p>Hafta mavzularidan missiyali o‘yin. Bolalar havola orqali o‘ynaydi, reytingni ko‘rasiz. 3 kredit.</p>
           <span className="go">Boshlash →</span>
         </button>
         <Link className="action-card" style={{ '--ac': 'var(--nature)' } as CSSProperties} to="/#tayyor">

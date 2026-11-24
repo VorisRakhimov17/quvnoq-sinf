@@ -51,6 +51,17 @@ Kabinetdagi “🎮 Mavzu bo‘yicha o‘yinlar” bo‘limi mavzuni yozganda 5 
 - Eski usul (savollarni tahrirlab “Mening savollarim”ga saqlash) shu bo‘lim pastida qoldi.
   Kalit: `backend/.env` dagi `ANTHROPIC_API_KEY`. Har bir o‘qituvchiga kuniga 30 ta yaratish limiti bor.
 
+## Sarguzasht o‘yini (missiyalar)
+
+Kabinetdagi “🗺️ Sarguzashtlar”: o‘qituvchi hafta yoki oy mavzularini (2–8 ta, har biri yangi qatordan) yozadi,
+AI har bir mavzuga missiya tuzadi (3 kredit, ~1 daqiqa, ≈ $0.15). Bolalar **kirmasdan** `/sarguzasht/<kod>` havolasi
+orqali o‘ynaydi: ism va qahramon tanlaydi, yo‘l bo‘ylab yuradi, qahramonlarga yordam beradi (5 ta topshiriq:
+savol, to‘g‘ri/noto‘g‘ri, tartib), 60% to‘g‘ri bo‘lsa darvoza ochiladi va mukofot beriladi. Oxirida xazina.
+- Boshqarish: strelkalar/WASD, ekranga bosib yurish, Enter — gaplashish; telefonda ekrandagi tugmalar.
+- Natija brauzerda saqlanadi va serverga yuboriladi; o‘qituvchi “🏅 Reyting”da yulduz, missiya va tangalarni ko‘radi.
+- Kod: `backend/src/adventures/`, `frontend/src/adventure/` (world.ts — xarita, Engine.tsx — canvas o‘yin sikli,
+  MissionDialog.tsx — topshiriqlar), `frontend/src/pages/AdventurePlay.tsx`.
+
 ## Dars prezentatsiyasi
 
 Kabinetdagi “🎬 Prezentatsiya” bo‘limi mavzu bo‘yicha to‘liq dars slaydlarini yaratadi: muqova, topishmoq, hikoya,
@@ -112,3 +123,7 @@ Barcha yo‘llar `/api` ostida. Belgilanganlari uchun `Authorization: Bearer <to
 | DELETE | `/api/presentations/:id` | 🔒 o‘chirish |
 | POST | `/api/packs/generate` | 🔒 5 xil o‘yinli to‘plam yaratish va saqlash (1 kredit) |
 | GET/DELETE | `/api/packs`, `/api/packs/:id` | 🔒 mening to‘plamlarim / bittasi / o‘chirish |
+| POST | `/api/adventures/generate` | 🔒 sarguzasht yaratish (3 kredit) |
+| GET | `/api/adventures`, `/api/adventures/:id/leaderboard` | 🔒 ro‘yxat / o‘quvchilar reytingi |
+| GET | `/api/play/:code` | ochiq: sarguzasht ma’lumoti (o‘quvchilar uchun) |
+| POST | `/api/play/:code/progress` | ochiq: o‘quvchi natijasini saqlash |

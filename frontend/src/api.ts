@@ -1,3 +1,4 @@
+import type { AdventureRow, LeaderRow, PublicAdventure } from './adventure/types';
 import type { Presentation, PresentationRow } from './deck/types';
 import type { SubjectId } from './games/types';
 import type { GamePack, GamePackRow } from './pack/types';
@@ -97,6 +98,16 @@ export const api = {
   deletePack: (id: number) => request<{ deleted: boolean }>(`/packs/${id}`, 'DELETE'),
   generatePack: (p: { subject: SubjectId; grade: number; topic: string }) =>
     request<{ id: number; credits: number }>('/packs/generate', 'POST', p),
+
+  adventures: () => request<AdventureRow[]>('/adventures'),
+  adventureCost: () => request<{ cost: number }>('/adventures/cost'),
+  generateAdventure: (p: { grade: number; topics: string[]; wishes?: string }) =>
+    request<{ id: number; code: string; credits: number }>('/adventures/generate', 'POST', p),
+  deleteAdventure: (id: number) => request<{ deleted: boolean }>(`/adventures/${id}`, 'DELETE'),
+  adventureLeaderboard: (id: number) => request<LeaderRow[]>(`/adventures/${id}/leaderboard`),
+  playAdventure: (code: string) => request<PublicAdventure>(`/play/${encodeURIComponent(code)}`),
+  playProgress: (code: string, p: { playerId: string; name: string; avatar: string; stars: number; coins: number; missions: number; finished: boolean }) =>
+    request<{ ok: boolean }>(`/play/${encodeURIComponent(code)}/progress`, 'POST', p),
 
   credits: () => request<{ credits: number; history: CreditTx[] }>('/credits'),
   purchaseConfig: () => request<PurchaseConfig>('/purchases/config'),

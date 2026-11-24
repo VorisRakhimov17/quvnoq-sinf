@@ -1,6 +1,7 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './auth';
 import AdminPage from './pages/AdminPage';
+import AdventurePlay from './pages/AdventurePlay';
 import GamePage from './pages/GamePage';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -46,6 +47,7 @@ function Header() {
             <>
               <Link to={sectionLink('oyin')} className={at === 'oyin' ? 'active' : ''}>🎮 O‘yin yaratish</Link>
               <Link to={sectionLink('prezentatsiya')} className={at === 'prezentatsiya' ? 'active' : ''}>🎬 Prezentatsiya</Link>
+              <Link to={sectionLink('sarguzasht')} className={at === 'sarguzasht' ? 'active' : ''}>🗺️ Sarguzasht</Link>
             </>
           )}
         </nav>
@@ -78,7 +80,7 @@ function TabBar() {
   if (!teacher) return null;
   const items = [
     { to: '/', icon: '🧩', label: 'Tayyor', on: at === 'home' },
-    ...SECTIONS.filter((s) => s.id !== 'questions' && s.id !== 'results').map((s) => ({ to: sectionLink(s.id), icon: s.icon, label: s.short, on: at === s.id })),
+    ...SECTIONS.filter((s) => s.id !== 'questions' && s.id !== 'results' && s.id !== 'kredit').map((s) => ({ to: sectionLink(s.id), icon: s.icon, label: s.short, on: at === s.id })),
   ];
   return (
     <nav className="tabbar" aria-label="Pastki menyu">
@@ -92,7 +94,7 @@ function TabBar() {
 export default function App() {
   const settings = useSettings();
   const path = useLocation().pathname;
-  const inGame = path.startsWith('/oyin/') || path.startsWith('/prezentatsiya/') || path.startsWith('/toplam/');
+  const inGame = path.startsWith('/oyin/') || path.startsWith('/prezentatsiya/') || path.startsWith('/toplam/') || path.startsWith('/sarguzasht/');
   return (
     <>
       {!inGame && <Header />}
@@ -105,6 +107,7 @@ export default function App() {
           <Route path="/prezentatsiya/:id" element={<PresentPage />} />
           <Route path="/toplam/:id" element={<PackPage settings={settings} />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/sarguzasht/:code" element={<AdventurePlay />} />
           <Route path="*" element={<p className="empty">Sahifa topilmadi. <Link to="/">Bosh sahifaga qaytish</Link></p>} />
         </Routes>
       </div>
