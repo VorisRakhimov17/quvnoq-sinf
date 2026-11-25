@@ -59,12 +59,12 @@ function Header() {
           <span><b>Quvnoq Sinf</b><small>1–4-sinflar uchun o‘yinli darslar</small></span>
         </Link>
         <nav className="mainnav" aria-label="Asosiy menyu">
-          <Link to="/" className={at === 'home' ? 'active' : ''}>🧩 Tayyor o‘yinlar</Link>
+          <Link to="/" className={at === 'home' ? 'active' : ''}><span className="ni">🧩</span>Tayyor o‘yinlar</Link>
           {teacher && (
             <>
-              <Link to={sectionLink('oyin')} className={at === 'oyin' ? 'active' : ''}>🎮 O‘yin yaratish</Link>
-              <Link to={sectionLink('prezentatsiya')} className={at === 'prezentatsiya' ? 'active' : ''}>🎬 Prezentatsiya</Link>
-              <Link to={sectionLink('sarguzasht')} className={at === 'sarguzasht' ? 'active' : ''}>🗺️ Sarguzasht</Link>
+              <Link to={sectionLink('oyin')} className={at === 'oyin' ? 'active' : ''}><span className="ni">🎮</span>O‘yin yaratish</Link>
+              <Link to={sectionLink('prezentatsiya')} className={at === 'prezentatsiya' ? 'active' : ''}><span className="ni">🎬</span>Prezentatsiya</Link>
+              <Link to={sectionLink('sarguzasht')} className={at === 'sarguzasht' ? 'active' : ''}><span className="ni">🗺️</span>Sarguzasht</Link>
             </>
           )}
         </nav>
@@ -72,7 +72,7 @@ function Header() {
           <ThemeToggle />
           {teacher ? (
             <>
-              {teacher.isAdmin && <Link className="ghost small" to="/admin">⚙️ Admin</Link>}
+              {teacher.isAdmin && <Link className="ghost small" to="/admin" title="Admin">⚙️ <span className="lbl">Admin</span></Link>}
               <Link className="credit-chip" to={sectionLink('kredit')} title="Kredit balansi">💎 {teacher.credits}</Link>
               <Link className="user-chip" to="/kabinet" title="Mening kabinetim">
                 <span className="avatar">{teacher.name.trim()[0]?.toUpperCase() ?? '?'}</span>

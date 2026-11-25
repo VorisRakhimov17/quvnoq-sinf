@@ -88,16 +88,17 @@ h1, h2, h3 { font-family: var(--display); line-height: 1.12; }
 
 /* ---------- Yuqori panel ---------- */
 .topbar { position: sticky; top: 0; z-index: 20; background: var(--card); border-bottom: 2px solid var(--line); }
-.topbar-in { max-width: 1200px; margin: 0 auto; height: 70px; padding: 0 16px; display: flex; align-items: center; gap: 18px; }
+.topbar-in { max-width: 1360px; margin: 0 auto; height: 70px; padding: 0 16px; display: flex; align-items: center; gap: 18px; }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex: none; }
 .logo svg { width: 42px; height: 42px; }
 .logo b { font-family: var(--display); font-weight: 800; font-size: 1.55rem; line-height: 1; letter-spacing: -.01em; }
 .logo small { display: block; color: var(--muted); font-weight: 700; font-size: .72rem; letter-spacing: .02em; }
-.mainnav { display: flex; gap: 4px; margin-left: 8px; }
-.mainnav a { display: flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 12px; text-decoration: none; font-weight: 800; color: var(--muted); }
+.mainnav { display: flex; gap: 2px; margin-left: 4px; min-width: 0; }
+.mainnav a { display: flex; align-items: center; gap: 7px; padding: 9px 12px; white-space: nowrap; flex: none; border-radius: 12px; text-decoration: none; font-weight: 800; color: var(--muted); }
 .mainnav a:hover { color: var(--ink); background: var(--soft); }
 .mainnav a.active { color: var(--brand); background: var(--brand-soft); }
-.top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.top-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; white-space: nowrap; }
+.top-right > * { flex: none; }
 .theme-toggle { width: 40px; height: 40px; padding: 0; border-radius: 999px; border: 2px solid var(--line); background: var(--card); font-size: 1.15rem; line-height: 1; cursor: pointer; box-shadow: none; display: inline-grid; place-items: center; }
 .theme-toggle:hover { border-color: var(--brand); }
 .credit-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; background: color-mix(in srgb, var(--sun) 25%, var(--card)); border: 2px solid var(--sun); font-weight: 800; text-decoration: none; font-variant-numeric: tabular-nums; }
@@ -107,9 +108,21 @@ h1, h2, h3 { font-family: var(--display); line-height: 1.12; }
 .user-chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .avatar { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--sun); color: var(--ink); font-family: var(--display); font-weight: 800; font-size: 1.05rem; }
 
-/* Telefonda pastki menyu */
+/* O'rtacha ekranlarda menyu bir qatorda sig'ishi uchun ixchamlashadi */
+@media (max-width: 1320px) {
+  .logo small { display: none; }
+}
+@media (max-width: 1160px) {
+  .user-chip .uname, .top-right .lbl { display: none; }
+  .user-chip { padding: 3px; }
+  .mainnav a { padding: 9px 9px; gap: 5px; }
+}
+@media (max-width: 1100px) {
+  .mainnav .ni { display: none; }
+}
+/* Planshet va telefonda pastki menyu */
 .tabbar { display: none; }
-@media (max-width: 760px) {
+@media (max-width: 1024px) {
   .mainnav, .user-chip .uname, .logo small { display: none; }
   .user-chip { padding: 3px; }
   .topbar-in { height: 62px; gap: 10px; }
