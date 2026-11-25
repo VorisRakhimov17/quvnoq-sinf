@@ -10,6 +10,7 @@ import PresentPage from './pages/PresentPage';
 import TeacherPage from './pages/TeacherPage';
 import { SECTIONS, sectionLink, type SectionId } from './nav';
 import { useSettings } from './settings';
+import { useState } from 'react';
 
 export function Logo() {
   return (
@@ -29,6 +30,22 @@ function useSection(): SectionId | 'home' | null {
   if (pathname !== '/kabinet') return null;
   const t = new URLSearchParams(search).get('tab');
   return (SECTIONS.find((s) => s.id === (t === 'topic' ? 'oyin' : t))?.id ?? 'panel');
+}
+
+/** Oq / qora fon almashtirgich; tanlov brauzerda eslab qolinadi */
+function ThemeToggle() {
+  const [dark, setDark] = useState(() => document.documentElement.dataset.theme === 'dark');
+  const flip = () => {
+    const t = dark ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem('theme', t); } catch { /* saqlanmasa ham ishlaydi */ }
+    setDark(!dark);
+  };
+  return (
+    <button type="button" className="theme-toggle" onClick={flip} aria-label={dark ? 'Oq fonga o‘tish' : 'Qora fonga o‘tish'} title={dark ? 'Oq fon' : 'Qora fon'}>
+      {dark ? '☀️' : '🌙'}
+    </button>
+  );
 }
 
 function Header() {
@@ -52,6 +69,7 @@ function Header() {
           )}
         </nav>
         <div className="top-right">
+          <ThemeToggle />
           {teacher ? (
             <>
               {teacher.isAdmin && <Link className="ghost small" to="/admin">⚙️ Admin</Link>}
