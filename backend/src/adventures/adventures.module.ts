@@ -72,7 +72,7 @@ const RawAdventure = z.object({
     rewardName: z.string(),
     rewardEmoji: z.string(),
     tasks: z.array(z.object({
-      kind: z.enum(['choice', 'truefalse', 'order']),
+      kind: z.enum(['choice', 'truefalse', 'order', 'match']),
       question: z.string(),
       options: z.array(z.string()),
       answer: z.string(),
@@ -106,8 +106,11 @@ Write:
   - success: one sentence the character says when the mission is complete;
   - rewardName and rewardEmoji: an item the hero receives (a key, a map piece, a magic stone…);
   - tasks: exactly 5 tasks on the mission's topic, getting a little harder, mixing kinds:
-    3 × "choice": question (≤ 110 characters), options = exactly 4 short options (all different), answer copied
-      exactly from options;
+    2 × "choice": question (≤ 110 characters), options = exactly 4 short options (all different, ideally ≤ 24
+      characters each), answer copied exactly from options;
+    1 × "match": question is the instruction (e.g. "Har bir misolni javobi bilan juftlang"), options = exactly 4
+      pairs written as "left|right" (one "|" in each; every left and every right is different and short, ≤ 22
+      characters; each left has exactly one correct right), answer is an empty string;
     1 × "truefalse": question is a statement, options = ["To‘g‘ri", "Noto‘g‘ri"], answer is one of them;
     1 × "order": question is the instruction, options = 3–5 short items listed in the CORRECT order (the game shuffles
       them), answer is an empty string. The order must be unambiguous.
@@ -251,7 +254,7 @@ export class AdventuresService {
 const cut = (s: string, n: number) => s.trim().slice(0, n);
 const emo = (s: string, d: string) => [...s.trim()].slice(0, 3).join('').slice(0, 12) || d;
 const TF = ['To‘g‘ri', 'Noto‘g‘ri'];
-type Task = { kind: 'choice' | 'truefalse' | 'order'; question: string; options: string[]; answer: string; explain: string };
+type Task = { kind: 'choice' | 'truefalse' | 'order' | 'match'; question: string; options: string[]; answer: string; explain: string };
 
 function clean(r: Raw) {
   const missions = r.missions.slice(0, 8).map((m) => {
@@ -262,6 +265,13 @@ function clean(r: Raw) {
       if (t.kind === 'truefalse') {
         const a = t.answer.trim().toLowerCase().startsWith('n') ? TF[1] : TF[0];
         return [{ kind: 'truefalse', question, options: TF, answer: a, explain }];
+      }
+      if (t.kind === 'match') {
+        // "chap|o'ng" juftlari: ikkala tomoni ham bo'sh emas va takrorlanmas bo'lishi kerak
+        const pairs = t.options.map((o) => o.split('|')).filter((x) => x.length === 2)
+          .map(([a, b]) => [cut(a, 40), cut(b, 40)]).filter(([a, b]) => a && b);
+        const ok = pairs.filter(([a, b], k) => pairs.findIndex(([a2, b2]) => a2 === a || b2 === b) === k).slice(0, 5);
+        return ok.length >= 3 ? [{ kind: 'match', question, options: ok.map(([a, b]) => `${a}|${b}`), answer: '', explain }] : [];
       }
       const options = [...new Set(t.options.map((o) => cut(o, 70)).filter(Boolean))];
       if (t.kind === 'order') {

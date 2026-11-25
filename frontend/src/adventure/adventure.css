@@ -1,4 +1,10 @@
 /* Sarguzasht o'yini. Klasslar "adv-" bilan boshlanadi, sayt uslublariga ta'sir qilmaydi. */
+/* O'yin sahifasi doim yorug' ranglarda (sayt qorong'i rejimda bo'lsa ham) */
+.adv-page {
+  --paper: #FBFCFE; --card: #FFFFFF; --soft: #F1F5F9; --line: #E2E8F0; --ink: #1E293B; --muted: #475569;
+  --brand: #1E3A8A; --brand-ink: #FFFFFF; --brand-soft: #DBEAFE; --brand-dark: #172E6E; --c: #1E3A8A;
+  color-scheme: light;
+}
 .adv-page { position: fixed; inset: 0; z-index: 40; background: #5DB7E6; color: #1E293B; display: flex; flex-direction: column; font-family: var(--body); }
 .adv-page:not(.playing) { overflow: auto; background: #DFF1FB url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ctext x='8' y='40' font-size='22' opacity='.35'%3E%E2%98%81%EF%B8%8F%3C/text%3E%3C/svg%3E"); align-items: center; padding: 24px 16px; }
 
@@ -36,7 +42,7 @@
 .adv-prompt .primary { font-size: 1.2rem; box-shadow: 0 4px 0 #172E6E, 0 10px 24px rgb(0 0 0 / .25); }
 .adv-prompt kbd { font-family: var(--body); font-size: .75rem; border: 2px solid rgb(255 255 255 / .6); border-radius: 6px; padding: 0 6px; margin-left: 4px; }
 .adv-locked { background: #fff; border-radius: 16px; padding: 10px 16px; font-weight: 800; box-shadow: 0 4px 0 #CBD5E1; }
-.adv-hint, .adv-toast { position: absolute; left: 50%; top: 84px; translate: -50% 0; background: rgb(255 255 255 / .95); border-radius: 14px; padding: 8px 16px; font-weight: 700; box-shadow: 0 3px 0 #B9D6E8; pointer-events: none; text-align: center; }
+.adv-hint, .adv-toast { position: absolute; left: 50%; bottom: 150px; translate: -50% 0; background: rgb(255 255 255 / .95); border-radius: 14px; padding: 8px 16px; font-weight: 700; box-shadow: 0 3px 0 #B9D6E8; pointer-events: none; text-align: center; }
 .adv-toast { top: auto; bottom: 90px; background: #1E293B; color: #fff; box-shadow: none; }
 @keyframes adv-up { from { opacity: 0; translate: -50% 12px; } }
 
@@ -122,3 +128,92 @@
   .adv-hud .adv-bag { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .adv-card, .adv-stars span, .adv-confetti i, .adv-trophy, .adv-reward span { animation: none !important; } }
+
+/* ---------- Qahramon tanlash ---------- */
+.adv-pick { display: flex; gap: 12px; align-items: center; }
+.adv-pick-hero { flex: none; width: 110px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #DBEAFE; border-radius: 20px; padding: 8px 6px; animation: adv-pop .35s cubic-bezier(.3,1.5,.5,1) both; }
+.adv-pick-hero span { font-size: 3.6rem; line-height: 1.1; animation: adv-bob 1.6s ease-in-out infinite; }
+.adv-pick-hero b { font-size: .9rem; color: #1E3A8A; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adv-pick .adv-avatars { flex: 1; grid-template-columns: repeat(6, 1fr); }
+@keyframes adv-bob { 50% { transform: translateY(-6px); } }
+
+/* ---------- HUD qo'shimchalari ---------- */
+.adv-stats > button.off { opacity: .4; }
+.adv-stats > .adv-shopbtn { background: #FBBF24; color: #1E293B; box-shadow: 0 3px 0 #D97706; }
+.adv-qchip { background: #FEF3C7 !important; color: #92400E; animation: adv-pulse 1.4s ease-in-out infinite; }
+@keyframes adv-pulse { 50% { transform: scale(1.07); } }
+
+/* ---------- Missiya: qidiruv, seriya, portlash ---------- */
+.adv-quest-ask { background: #FEF3C7; }
+.adv-quest-dots { display: flex; justify-content: center; gap: 10px; font-size: 2.2rem; }
+.adv-quest-dots span { filter: grayscale(1); opacity: .35; }
+.adv-quest-dots span.on, .adv-quest-ask ~ .adv-quest-dots span { filter: none; opacity: 1; }
+.adv-streak { padding: 2px 10px; border-radius: 999px; background: #FEE2E2; color: #B91C1C; animation: adv-pop .3s cubic-bezier(.3,1.8,.5,1) both; }
+.adv-burst { position: absolute; left: 50%; top: 45%; width: 0; height: 0; pointer-events: none; z-index: 5; }
+.adv-burst i { position: absolute; left: -12px; top: -12px; font-style: normal; font-size: 1.5rem; animation: adv-fly .9s ease-out both; }
+.adv-burst.big i { font-size: 2rem; animation-duration: 1.3s; }
+@keyframes adv-fly {
+  from { transform: rotate(var(--a)) translateX(0) scale(.3); opacity: 1; }
+  to { transform: rotate(var(--a)) translateX(var(--d)) scale(1); opacity: 0; }
+}
+.adv-gain { font-family: var(--display); font-size: 1.6rem; font-weight: 900; color: #B45309; animation: adv-pop .5s .6s cubic-bezier(.3,1.6,.5,1) both; }
+.adv-gain small { font-family: var(--body); font-size: .95rem; color: #92400E; }
+
+/* ---------- Sharlar o'yini ---------- */
+.adv-sky { position: relative; height: 290px; border-radius: 18px; overflow: hidden; background: linear-gradient(#BFE3FA, #E8F6FF); }
+.adv-balloon { --c: #EF4444; position: absolute; bottom: -130px; width: clamp(104px, 19%, 128px); height: 150px; border: 0; padding: 0; background: none; animation: adv-rise var(--t, 9s) linear infinite; cursor: pointer; }
+.adv-balloon span { position: absolute; inset: 0 0 20px; display: grid; place-items: center; padding: 10px; border-radius: 50% 50% 48% 48% / 55% 55% 45% 45%; background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / .55), transparent 30%), var(--c); color: #fff; font-family: var(--display); font-weight: 900; font-size: clamp(.95rem, 2.2vw, 1.2rem); line-height: 1.1; text-shadow: 0 2px 0 rgb(0 0 0 / .25); box-shadow: inset -8px -10px 0 rgb(0 0 0 / .12); }
+.adv-balloon::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 2px; height: 22px; background: #64748B; }
+.adv-balloon:hover:not(:disabled) span { filter: brightness(1.1); transform: scale(1.05); }
+.adv-balloon:disabled { cursor: default; animation-play-state: paused; }
+.adv-balloon.pop span { animation: adv-burstb .35s ease-out forwards; }
+.adv-balloon.pop::after, .adv-balloon.away { opacity: .25; }
+.adv-balloon.right span { outline: 5px solid #16A34A; outline-offset: 3px; }
+@keyframes adv-rise { 0% { bottom: -130px; translate: 0 0; } 25% { translate: 14px 0; } 50% { translate: -10px 0; } 75% { translate: 12px 0; } 100% { bottom: 105%; translate: 0 0; } }
+@keyframes adv-burstb { to { transform: scale(1.6); opacity: 0; } }
+
+/* ---------- Juftini topish ---------- */
+.adv-match { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.adv-match > div { display: flex; flex-direction: column; gap: 8px; }
+.adv-mcell { min-height: 54px; padding: 8px 12px; border-radius: 14px; border: 3px solid #CBD5E1; background: #fff; font-weight: 800; font-size: 1.1rem; box-shadow: 0 3px 0 #CBD5E1; transition: transform .1s; }
+.adv-mcell:hover:not(:disabled) { border-color: #1E3A8A; transform: translateY(-2px); }
+.adv-mcell:disabled { cursor: default; }
+.adv-mcell.sel { border-color: #FBBF24; background: #FEF3C7; box-shadow: 0 3px 0 #D97706; }
+.adv-mcell.ok { border-color: #16A34A; background: #DCFCE7; color: #166534; box-shadow: 0 3px 0 #16A34A; }
+.adv-mcell.bad { border-color: #DC2626; background: #FEE2E2; animation: adv-shake .35s; }
+
+/* ---------- Do'kon ---------- */
+.adv-shop h4 { margin: 4px 0 0; font-family: var(--display); font-size: 1.2rem; color: #1E3A8A; }
+.adv-wallet { margin-left: auto; padding: 6px 14px; border-radius: 999px; background: #FEF3C7; font-weight: 900; font-size: 1.15rem; }
+.adv-wallet + .adv-x { margin-left: 8px; }
+.adv-preview { position: relative; align-self: center; width: 180px; height: 130px; border-radius: 22px; background: radial-gradient(circle at 50% 80%, #BBF7D0, #DBEAFE 70%); }
+.adv-preview-hero { position: absolute; left: 50%; top: 34px; translate: -50% 0; font-size: 4rem; line-height: 1; }
+.adv-preview-hat { position: absolute; left: 50%; top: 6px; translate: -50% 0; font-size: 2.3rem; line-height: 1; z-index: 1; }
+.adv-preview-pet { position: absolute; right: 18px; bottom: 16px; font-size: 2rem; line-height: 1; animation: adv-bob 1.2s ease-in-out infinite; }
+.adv-preview b { position: absolute; left: 0; right: 0; bottom: -2px; text-align: center; font-size: .85rem; color: #1E3A8A; }
+.adv-heroes { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; }
+.adv-heroes button { aspect-ratio: 1; font-size: 1.6rem; border-radius: 12px; border: 3px solid #E2E8F0; background: #fff; padding: 0; }
+.adv-heroes button.on { border-color: #1E3A8A; background: #DBEAFE; }
+.adv-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.adv-sitem { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 16px; border: 3px solid #E2E8F0; text-align: center; }
+.adv-sitem-e { font-size: 2.4rem; line-height: 1.1; }
+.adv-sitem b { font-size: .9rem; }
+.adv-sitem small { font-weight: 800; color: #92400E; }
+.adv-sitem.worn { border-color: #16A34A; background: #F0FDF4; }
+.adv-sitem.locked .adv-sitem-e { filter: grayscale(.7); opacity: .6; }
+
+/* ---------- Yakun: medal ---------- */
+.adv-medal { display: flex; align-items: center; gap: 10px; padding: 8px 18px; border-radius: 999px; background: #FEF3C7; }
+.adv-medal span { font-size: 2.6rem; line-height: 1; animation: adv-pop .6s .4s cubic-bezier(.3,1.6,.5,1) both; }
+.adv-medal b { font-family: var(--display); font-size: 1.4rem; color: #92400E; }
+
+@media (max-width: 560px) {
+  .adv-pick { flex-direction: column; }
+  .adv-pick .adv-avatars { width: 100%; }
+  .adv-heroes { grid-template-columns: repeat(6, 1fr); }
+  .adv-mcell { font-size: .95rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .adv-burst, .adv-pick-hero span, .adv-preview-pet, .adv-qchip { animation: none !important; }
+  .adv-balloon { animation: none !important; bottom: 40px; }
+}

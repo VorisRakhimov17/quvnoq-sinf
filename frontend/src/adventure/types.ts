@@ -1,6 +1,7 @@
 /** Sarguzasht ma'lumotlari (backend adventures.module.ts dagi clean() bilan bir xil) */
 export type ZoneId = 'meadow' | 'forest' | 'desert' | 'snow' | 'beach' | 'village' | 'mountain' | 'candy';
-export type Task = { kind: 'choice' | 'truefalse' | 'order'; question: string; options: string[]; answer: string; explain: string };
+/** match: options = "chap|o'ng" juftlari */
+export type Task = { kind: 'choice' | 'truefalse' | 'order' | 'match'; question: string; options: string[]; answer: string; explain: string };
 export type Mission = {
   topic: string; title: string; zone: ZoneId; npcName: string; npcEmoji: string;
   story: string; success: string; rewardName: string; rewardEmoji: string; tasks: Task[];
@@ -21,4 +22,9 @@ export type Save = {
   coins: number;
   taken: string[];      // yig'ilgan tangalar ("x,y")
   pos?: { x: number; y: number };
+  spent?: number;       // do'konda sarflangan tangalar (reytingda jami tanga = coins + spent)
+  owned?: string[];     // sotib olingan / yutilgan narsalar (shop.ts dagi id)
+  hat?: string;         // kiyilgan shapka id
+  pet?: string;         // ergashib yuruvchi do'st id
+  quest?: { k: number; got: string[] } | null; // yo'qolgan buyumlarni qidirish
 };

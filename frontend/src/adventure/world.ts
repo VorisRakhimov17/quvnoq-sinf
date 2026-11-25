@@ -1,3 +1,4 @@
+import { LOST_COUNT } from './shop';
 import type { Mission, ZoneId } from './types';
 
 /* Sarguzasht dunyosi: chapdan o'ngga zonalar ketma-ketligi.
@@ -42,6 +43,7 @@ export type World = {
   npcs: Npc[];
   gates: Gate[];
   coins: { x: number; y: number; id: string }[];
+  lost: { k: number; x: number; y: number; id: string }[]; // har missiya zonasida qidiriladigan buyumlar
   spawn: { x: number; y: number };
   chest: { x: number; y: number };
   pathY: (x: number) => number;
@@ -152,7 +154,34 @@ export function buildWorld(code: string, missions: Mission[]): World {
     }
   }
 
-  return { W, H, zoneOf, path, water, decos, solidAt, npcs, gates, coins, spawn, chest, pathY };
+  const world: World = { W, H, zoneOf, path, water, decos, solidAt, npcs, gates, coins, lost: [], spawn, chest, pathY };
+
+  // Yo'qolgan buyumlar: alohida tasodif (boshqa narsalarning joyi o'zgarmasin), faqat yetib boriladigan kataklarda
+  const reach = new Set<string>([key(spawn.x, spawn.y)]);
+  const q: [number, number][] = [[spawn.x, spawn.y]];
+  const all = missions.map(() => true);
+  while (q.length) {
+    const [x, y] = q.pop()!;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy, kk = key(nx, ny);
+      if (!reach.has(kk) && walkable(world, nx, ny, all)) { reach.add(kk); q.push([nx, ny]); }
+    }
+  }
+  const r2 = rng(hash(code + ':lost'));
+  for (let k = 0; k < n; k++) {
+    const npc = npcs[k];
+    let tries = 0, placed = 0;
+    while (placed < LOST_COUNT && tries++ < 300) {
+      const x = zoneStart(k) + 1 + Math.floor(r2() * (ZONE_W - 3));
+      const y = 1 + Math.floor(r2() * (H - 2));
+      const kk = key(x, y);
+      if (!reach.has(kk) || busy.has(kk) || path.has(kk) || Math.hypot(x - npc.x, y - npc.y) < 3) continue;
+      world.lost.push({ k, x, y, id: kk });
+      busy.add(kk);
+      placed++;
+    }
+  }
+  return world;
 }
 
 /** Bu katakdan yurish mumkinmi (yopiq darvozalar hisobga olinadi) */

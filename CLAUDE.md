@@ -22,6 +22,8 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 - `backend/src/adventures/adventures.module.ts`: Adventure (ochiq `code`) + AdventureRun (o'quvchi natijasi, `playerId` brauzerda). `/api/play/*` kirishsiz — o'quvchilar uchun. Narx `ADVENTURE_COST` = 3 (5 missiya ≈ 1 900 in / 6 900 out token ≈ $0.15, 2026-11-24).
 - Frontend: `world.ts` xaritani kod bo'yicha urug'li tasodif bilan quradi (har safar bir xil), zonalar orasida darvoza; `Engine.tsx` canvas: statik yer qatlami bir marta chiziladi, harakat mayda qadamlarga bo'linadi (sekin kompyuterda ham to'g'ri tezlik).
 - Zo'ravonlik yo'q: missiyalar yordam berish, topish, tuzatish haqida (SYSTEM promptda).
+- Qiziqarli qism: `adventure/audio.ts` (Web Audio effektlar + fon musiqasi, fayl yo'q), `shop.ts` (qahramonlar, do'kon: shapka/do'st tangaga, 👑 xazinadan; yo'qolgan buyumlar; medal). Missiya birinchi marta: avval zonadagi 3 ta buyumni topish (`world.lost`, alohida urug'), keyin savollar. Topshiriq turlari: choice (bittasi frontendda "sharlar"ga aylanadi), truefalse, order, match ("chap|o'ng" juftlar). Tanga: yo'lda + har yangi yulduz uchun 2; reytingga `coins + spent` yuboriladi.
+- O'yin sahifasi `.adv-page` da yorug' tokenlarni qayta belgilaydi (sayt qorong'i rejimda ham o'yin yorug'). Sayt CSS'ida `.adv-item` band (o'qituvchi ro'yxati) — o'yinda boshqa nom ishlating.
 
 ## O'yinlar to'plami
 - `backend/src/packs/packs.module.ts` (GamePack, data JSON) ↔ `frontend/src/pack/types.ts`. 5 o'yin: quiz, truefalse, pairs, sort, order. Narx `GAME_COST` (1). `clean()` yaroqsiz elementni tashlaydi; bo'sh o'yin menyuda ko'rinmaydi.

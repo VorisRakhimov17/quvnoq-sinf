@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { sfx } from './audio';
 import type { Mission } from './types';
 import { TILE, findPath, key, walkable, type World } from './world';
 
@@ -9,13 +10,19 @@ type Props = {
   taken: string[];
   avatar: string;
   name: string;
+  hat?: string;       // shapka emojisi
+  pet?: string;       // ergashuvchi do'st emojisi
+  quest: { k: number; got: string[]; e: string } | null;
   paused: boolean;
   start: { x: number; y: number };
   onCoin: (id: string) => void;
+  onFind: (id: string) => void;
   onTalk: (k: number) => void;
   onChest: () => void;
   onPos: (p: { x: number; y: number }) => void;
 };
+
+type Fx = { x: number; y: number; t0: number; text?: string; color: string; burst?: boolean };
 
 type Near = { kind: 'npc'; k: number } | { kind: 'gate'; k: number } | { kind: 'chest' } | null;
 
@@ -51,6 +58,10 @@ export default function Engine(p: Props) {
   const facing = useRef(1);
   const moving = useRef(false);
   const nearRef = useRef<Near>(null);
+  const fx = useRef<Fx[]>([]);
+  const grabbed = useRef(new Set<string>());
+  const petPos = useRef({ x: p.start.x - 0.8, y: p.start.y + 0.2 });
+  const prevDone = useRef(p.done);
   const [near, setNear] = useState<Near>(null);
 
   const interact = () => {
@@ -185,8 +196,27 @@ export default function Engine(p: Props) {
       const { taken } = props.current;
       for (const c of world.coins) {
         if (taken.includes(c.id)) continue;
-        if (Math.hypot(c.x + 0.5 - pos.current.x, c.y + 0.5 - pos.current.y) < 0.65) props.current.onCoin(c.id);
+        if (grabbed.current.has(c.id)) continue;
+        if (Math.hypot(c.x + 0.5 - pos.current.x, c.y + 0.5 - pos.current.y) < 0.65) {
+          grabbed.current.add(c.id);
+          fx.current.push({ x: c.x + 0.5, y: c.y + 0.2, t0: performance.now(), text: '+1 🪙', color: '#B45309' });
+          props.current.onCoin(c.id);
+        }
       }
+      const qs = props.current.quest;
+      if (qs) for (const l of world.lost) {
+        if (l.k !== qs.k || qs.got.includes(l.id) || grabbed.current.has('L' + l.id)) continue;
+        if (Math.hypot(l.x + 0.5 - pos.current.x, l.y + 0.5 - pos.current.y) < 0.7) {
+          grabbed.current.add('L' + l.id);
+          fx.current.push({ x: l.x + 0.5, y: l.y + 0.3, t0: performance.now(), text: `${qs.got.length + 1}/${world.lost.filter((z) => z.k === qs.k).length} ${qs.e}`, color: '#1E3A8A', burst: true });
+          props.current.onFind(l.id);
+        }
+      }
+
+      // Do'st qahramon orqasidan ergashadi
+      const pp = petPos.current, tgx = pos.current.x - facing.current * 0.85, tgy = pos.current.y + 0.15;
+      const pd = Math.hypot(tgx - pp.x, tgy - pp.y);
+      if (pd > 3) { pp.x = tgx; pp.y = tgy; } else { const a = Math.min(1, dt * 5); pp.x += (tgx - pp.x) * a; pp.y += (tgy - pp.y) * a; }
 
       // Yaqin narsa: qahramon, darvoza, xazina
       let n: Near = null;
@@ -205,7 +235,16 @@ export default function Engine(p: Props) {
     };
 
     const draw = (t: number) => {
-      const { world, missions, done, taken, avatar, name } = props.current;
+      const { world, missions, done, taken, avatar, name, hat, pet, quest } = props.current;
+      if (prevDone.current !== done) {
+        world.gates.forEach((gt) => {
+          if (done[gt.k] && !prevDone.current[gt.k]) {
+            fx.current.push({ x: gt.x + 0.5, y: gt.y + 0.5, t0: performance.now() + 400, text: '🔓 Ochildi!', color: '#16A34A', burst: true });
+            setTimeout(() => sfx.gate(), 400);
+          }
+        });
+        prevDone.current = done;
+      }
       const vw = wrap.clientWidth, vh = wrap.clientHeight;
       const T = TILE * zoom;
       const worldW = world.W * T, worldH = world.H * T;
@@ -260,6 +299,18 @@ export default function Engine(p: Props) {
           g.drawImage(sprite('🪙', 64), ox + (c.x + 0.5) * T - px / 2, oy + (c.y + 0.5) * T - px / 2 + bob(c.x), px, px);
         } });
       }
+      if (quest) for (const l of world.lost) {
+        if (l.k !== quest.k || quest.got.includes(l.id) || l.x < x0 || l.x > x1) continue;
+        items.push({ y: l.y + 0.5, f: () => {
+          const cx = ox + (l.x + 0.5) * T, cy = oy + (l.y + 0.5) * T;
+          g.fillStyle = `rgba(255,236,120,${0.35 + Math.sin(t / 200 + l.x) * 0.2})`;
+          g.beginPath(); g.arc(cx, cy, T * 0.5, 0, Math.PI * 2); g.fill();
+          const px = T * 0.7;
+          g.drawImage(sprite(quest.e, 96), cx - px / 2, cy - px / 2 + bob(l.y), px, px);
+          const sp = T * 0.28, a = t / 300 + l.x;
+          g.drawImage(sprite('✨', 48), cx + Math.cos(a) * T * 0.45 - sp / 2, cy + Math.sin(a) * T * 0.45 - sp / 2, sp, sp);
+        } });
+      }
       const first = done.indexOf(false);
       for (const npc of world.npcs) {
         if (npc.x < x0 - 1 || npc.x > x1 + 1) continue;
@@ -270,7 +321,8 @@ export default function Engine(p: Props) {
           g.beginPath(); g.ellipse(cx, cy + T * 0.42, T * 0.38, T * 0.12, 0, 0, Math.PI * 2); g.fill();
           const px = T * 1.25;
           g.drawImage(sprite(m.npcEmoji, 96), cx - px / 2, cy - px / 2 - T * 0.05 + bob(npc.k * 2), px, px);
-          const mark = done[npc.k] ? '✅' : npc.k === first ? '❗' : '';
+          const searching = quest && quest.k === npc.k && quest.got.length < world.lost.filter((z) => z.k === npc.k).length;
+          const mark = done[npc.k] ? '✅' : npc.k === first ? (searching ? '🔍' : '❗') : '';
           if (mark) {
             const mp = T * 0.55, my = cy - T * 1.05 + Math.sin(t / 250) * T * 0.08;
             g.fillStyle = '#fff';
@@ -301,10 +353,49 @@ export default function Engine(p: Props) {
         g.translate(cx, cy - hop - T * 0.12);
         g.scale(facing.current, 1);
         g.drawImage(sprite(avatar, 96), -px / 2, -px / 2, px, px);
+        if (hat) { const hp = px * 0.58; g.drawImage(sprite(hat, 64), -hp / 2, -px * 0.5 - hp * 0.55, hp, hp); }
         g.restore();
         label(cx, cy - T * 0.85 - hop, name, '#1E3A8A');
       } });
+      if (pet) {
+        const pp = petPos.current;
+        items.push({ y: pp.y + 0.2, f: () => {
+          const cx = ox + pp.x * T, cy = oy + pp.y * T;
+          const hop = Math.abs(Math.sin(t / 130 + 1)) * T * (moving.current ? 0.1 : 0.02);
+          g.fillStyle = 'rgba(0,0,0,.18)';
+          g.beginPath(); g.ellipse(cx, cy + T * 0.22, T * 0.2, T * 0.07, 0, 0, Math.PI * 2); g.fill();
+          const px = T * 0.62;
+          g.save(); g.translate(cx, cy - hop); g.scale(facing.current, 1);
+          g.drawImage(sprite(pet, 64), -px / 2, -px / 2, px, px);
+          g.restore();
+        } });
+      }
       items.sort((a, b) => a.y - b.y).forEach((it) => it.f());
+
+      // Effektlar: uchib chiqadigan yozuvlar va yulduzcha portlashlari
+      const now = performance.now();
+      fx.current = fx.current.filter((e) => now - e.t0 < 1300);
+      for (const e of fx.current) {
+        const k = (now - e.t0) / 1300;
+        if (k < 0) continue;
+        const cx = ox + e.x * T, cy = oy + e.y * T;
+        if (e.burst) {
+          for (let i = 0; i < 10; i++) {
+            const ang = (i / 10) * Math.PI * 2, d = T * (0.3 + k * 1.3), sp = T * 0.3 * (1 - k);
+            if (sp > 1) g.drawImage(sprite(i % 2 ? '⭐' : '✨', 48), cx + Math.cos(ang) * d - sp / 2, cy + Math.sin(ang) * d - sp / 2, sp, sp);
+          }
+        }
+        if (e.text) {
+          g.globalAlpha = Math.max(0, 1 - k * k);
+          g.font = `900 ${Math.max(14, T * 0.32)}px Nunito, sans-serif`;
+          g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.lineWidth = 5; g.strokeStyle = '#fff';
+          g.strokeText(e.text, cx, cy - T * 0.6 - k * T * 0.9);
+          g.fillStyle = e.color;
+          g.fillText(e.text, cx, cy - T * 0.6 - k * T * 0.9);
+          g.globalAlpha = 1;
+        }
+      }
 
       function label(cx: number, cy: number, text: string, color: string) {
         if (!text) return;
