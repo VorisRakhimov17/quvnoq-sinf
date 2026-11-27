@@ -47,6 +47,7 @@ Boshlang'ich sinflar (1–4) uchun o'yinli darslar platformasi. Muallifning onas
 - npm 11 install skriptlarini bloklaydi: yangi paket skript talab qilsa, `npm install-scripts approve <pkg>` (ildiz package.json `allowScripts`).
 - Backend tsconfig'da `incremental` ishlatmang: nest `deleteOutDir` bilan birga dist bo'sh qoladi.
 
-## Rejalar
-- Hozir: lokal kompyuterda ishlaydi (D:\Quvnoq sinf).
-- Keyin: GitHub repo, so'ng foydalanuvchi bergan serverga joylash (docs/deploy.md yoziladi).
+## Server (production)
+- https://quvnoq-sinf.uz — Eskiz VPS (1 GB RAM), batafsil `docs/deploy.md`. Kirish: `ssh quvnoq` (kalit `~/.ssh/quvnoq_sinf`).
+- Yangilash: push → `ssh quvnoq "bash /home/quvnoq/app/scripts/deploy.sh"`.
+- Telegram bot bitta token bilan faqat bitta joyda ishlaydi — lokal dev'da tokenni bo'sh qoldiring.
