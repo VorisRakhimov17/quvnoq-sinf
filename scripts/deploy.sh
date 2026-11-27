@@ -10,4 +10,4 @@ sudo -u quvnoq npm run build
 systemctl restart quvnoq
 sleep 3
 systemctl is-active quvnoq
-echo "Yangilandi: $(git log -1 --format='%h %s')"
+echo "Yangilandi: $(sudo -u quvnoq git log -1 --format='%h %s')"
