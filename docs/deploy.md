@@ -21,6 +21,7 @@ Sayt: **https://quvnoq-sinf.uz** (www ham). Server va domen — Eskiz.uz.
 | Baza | PostgreSQL 18, baza `quvnoq_sinf`, foydalanuvchi `quvnoq` |
 | Sirlar | `/home/quvnoq/app/backend/.env` (600). DB paroli va JWT_SECRET serverda alohida yaratilgan |
 | Devor | ufw: faqat 22, 80, 443. fail2ban yoqilgan |
+| SSL | Let's Encrypt (certbot --nginx, emailsiz), http → https yo'naltiriladi. `certbot.timer` o'zi yangilaydi (90 kunlik) |
 
 ## Yangilash
 Kompyuterda o'zgarishlarni GitHub'ga push qilgandan keyin:
